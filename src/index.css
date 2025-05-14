@@ -1,0 +1,165 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 240 5.9% 10%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 240 5.9% 10%;
+    --radius: 0.5rem;
+    
+    /* Custom unicorn colors */
+    --unicorn-purple: 270 100% 65%;
+    --unicorn-purpleDark: 270 100% 45%; 
+    --unicorn-magenta: 330 100% 65%;
+    --unicorn-skyBlue: 180 100% 75%;
+  }
+ 
+  .dark {
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 0 0% 98%;
+    --primary-foreground: 240 5.9% 10%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 240 4.9% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom styles */
+
+.unicorn-text-gradient {
+  @apply bg-gradient-to-r from-purple-600 via-pink-500 to-violet-500 text-transparent bg-clip-text;
+}
+
+.unicorn-card {
+  @apply bg-white rounded-xl shadow-lg border border-gray-100;
+  position: relative;
+  overflow: hidden;
+}
+
+.unicorn-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, hsl(var(--unicorn-purple)), hsl(var(--unicorn-magenta)));
+  z-index: 1;
+}
+
+.unicorn-button {
+  background: linear-gradient(135deg, hsl(var(--unicorn-purple)), hsl(var(--unicorn-magenta)));
+  @apply text-white rounded-md transition-transform hover:scale-105;
+}
+
+.sparkle-cursor {
+  cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32"><text x="0" y="26" font-size="24">✨</text></svg>'), auto;
+}
+
+/* Animation classes */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+}
+
+@keyframes float-fast {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg) scale(1);
+  }
+  50% {
+    transform: translateY(-15px) rotate(-3deg) scale(1.05);
+  }
+}
+
+.float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+}
+
+.float-fast {
+  animation: float-fast 4s ease-in-out infinite;
+}
+
+.rainbow-border {
+  position: relative;
+}
+
+.rainbow-border::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  bottom: -2px;
+  left: -2px;
+  background: linear-gradient(45deg, hsl(var(--unicorn-purple)), hsl(var(--unicorn-magenta)), hsl(var(--unicorn-skyBlue)), hsl(var(--unicorn-purple)));
+  background-size: 400% 400%;
+  border-radius: 6px;
+  z-index: -1;
+  animation: rainbow 6s ease-in-out infinite;
+}
+
+@keyframes rainbow {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
