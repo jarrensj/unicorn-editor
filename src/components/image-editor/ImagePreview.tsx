@@ -9,6 +9,7 @@ type ImagePreviewProps = {
   backgroundImage: string | null;
   onDownload: () => void;
   imageScale: number;
+  cornerRadius: number;
 };
 
 const ImagePreview = ({ 
@@ -16,7 +17,8 @@ const ImagePreview = ({
   selectedBackground, 
   backgroundImage,
   onDownload,
-  imageScale
+  imageScale,
+  cornerRadius
 }: ImagePreviewProps) => {
   return (
     <div className="flex flex-col">
@@ -61,7 +63,8 @@ const ImagePreview = ({
                       transform: `scale(${imageScale / 100})`,
                       transition: 'transform 0.2s ease-in-out',
                       maxWidth: '95%',
-                      maxHeight: '95%'
+                      maxHeight: '95%',
+                      borderRadius: `${cornerRadius}px`
                     }}
                   />
                 </div>

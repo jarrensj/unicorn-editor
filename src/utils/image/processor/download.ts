@@ -11,7 +11,8 @@ export const processImageDownload = (
   selectedBackground: string,
   backgroundImage: string | null,
   imageScale: number = 100, // Default scale is 100%
-  squareFormat: boolean = true // Parameter kept for compatibility but always used as true
+  squareFormat: boolean = true, // Parameter kept for compatibility but always used as true
+  cornerRadius: number = 0 // Corner radius parameter with default 0
 ) => {
   if (!imageUrl || !imageElement) return;
   
@@ -26,7 +27,7 @@ export const processImageDownload = (
         const bgImg = new Image();
         bgImg.onload = () => {
           drawBackgroundImage(ctx, bgImg, canvas);
-          drawMainImage(ctx, imageElement, canvas, imageScale);
+          drawMainImage(ctx, imageElement, canvas, imageScale, cornerRadius);
           finishDownload(canvas);
         };
         
@@ -34,7 +35,7 @@ export const processImageDownload = (
       } else {
         // Fill background color or use gradient
         drawBackground(ctx, canvas, selectedBackground);
-        drawMainImage(ctx, imageElement, canvas, imageScale);
+        drawMainImage(ctx, imageElement, canvas, imageScale, cornerRadius);
         finishDownload(canvas);
       }
     };

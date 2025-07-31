@@ -17,6 +17,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
   const [imageScale, setImageScale] = useState<number>(85); // Default to 85% scale to ensure it fits
+  const [cornerRadius, setCornerRadius] = useState<number>(0); // Add corner radius state
   
   // Load the image from props only, not localStorage
   useEffect(() => {
@@ -44,9 +45,13 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
     setImageScale(scale);
   };
   
+  const handleCornerRadiusChange = (radius: number) => {
+    setCornerRadius(radius);
+  };
+  
   const handleDownload = () => {
-    // Always use square format (true)
-    processImageDownload(imageUrl, imageElement, selectedBackground, backgroundImage, imageScale, true);
+    // Always use square format (true) and pass corner radius
+    processImageDownload(imageUrl, imageElement, selectedBackground, backgroundImage, imageScale, true, cornerRadius);
   };
   
   return (
@@ -72,6 +77,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
               backgroundImage={backgroundImage}
               onDownload={handleDownload}
               imageScale={imageScale}
+              cornerRadius={cornerRadius}
             />
             <div>
               <h3 className="text-xl font-semibold mb-4">Background Options</h3>
@@ -82,6 +88,8 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
                 imageUrl={imageUrl}
                 imageScale={imageScale}
                 onScaleChange={handleScaleChange}
+                cornerRadius={cornerRadius}
+                onCornerRadiusChange={handleCornerRadiusChange}
               />
             </div>
           </div>

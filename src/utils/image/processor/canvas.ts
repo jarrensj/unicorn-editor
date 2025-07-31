@@ -141,7 +141,8 @@ export const drawMainImage = (
   ctx: CanvasRenderingContext2D,
   img: HTMLImageElement,
   canvas: HTMLCanvasElement,
-  imageScale: number = 100
+  imageScale: number = 100,
+  cornerRadius: number = 0
 ): void => {
   // Apply scaling when drawing the main image
   const scaleFactor = imageScale / 100;
@@ -167,6 +168,20 @@ export const drawMainImage = (
   const offsetX = (canvas.width - scaledWidth) / 2;
   const offsetY = (canvas.height - scaledHeight) / 2;
   
+  // Save the current context state
+  ctx.save();
+  
+  // Apply corner radius if specified
+  if (cornerRadius > 0) {
+    // Create a clipping path with rounded corners
+    ctx.beginPath();
+    ctx.roundRect(offsetX, offsetY, scaledWidth, scaledHeight, cornerRadius);
+    ctx.clip();
+  }
+  
   // Draw image with scaling
   ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+  
+  // Restore context state
+  ctx.restore();
 };

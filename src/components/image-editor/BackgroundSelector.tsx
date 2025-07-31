@@ -3,6 +3,7 @@ import { useSavedBackgrounds } from "@/hooks/useSavedBackgrounds";
 import { useScrollIndicator } from "@/hooks/useScrollIndicator";
 import BackgroundOptionsList from "./background/BackgroundOptionsList";
 import ImageScale from "./ImageScale";
+import ImageCornerRadius from "./ImageCornerRadius";
 import { BackgroundOption } from "./background/StandardBackgroundOption";
 import { standardBackgroundOptions } from "./background/backgroundOptions";
 
@@ -13,6 +14,8 @@ type BackgroundSelectorProps = {
   imageScale?: number;
   onScaleChange?: (scale: number) => void;
   imageUrl: string | null;
+  cornerRadius?: number;
+  onCornerRadiusChange?: (radius: number) => void;
 };
 
 const BackgroundSelector = ({ 
@@ -21,7 +24,9 @@ const BackgroundSelector = ({
   initialBackground, 
   imageScale, 
   onScaleChange,
-  imageUrl 
+  imageUrl,
+  cornerRadius,
+  onCornerRadiusChange
 }: BackgroundSelectorProps) => {
   const [selectedId, setSelectedId] = useState("rainbow"); // Default to rainbow
   const [customImage, setCustomImage] = useState<string | null>(null);
@@ -126,11 +131,24 @@ const BackgroundSelector = ({
         onChange={handleImageUpload}
       />
 
-      {/* Image size control slider */}
-      {imageUrl && imageScale !== undefined && onScaleChange && (
-        <div className="mt-4">
-          <h3 className="text-sm font-medium mb-2 text-gray-700">Image Size</h3>
-          <ImageScale imageScale={imageScale} onScaleChange={onScaleChange} />
+      {/* Image controls */}
+      {imageUrl && (
+        <div className="space-y-4">
+          {/* Image size control slider */}
+          {imageScale !== undefined && onScaleChange && (
+            <div>
+              <h3 className="text-sm font-medium mb-2 text-gray-700">Image Size</h3>
+              <ImageScale imageScale={imageScale} onScaleChange={onScaleChange} />
+            </div>
+          )}
+          
+          {/* Corner toggle control */}
+          {cornerRadius !== undefined && onCornerRadiusChange && (
+            <div>
+              <h3 className="text-sm font-medium mb-2 text-gray-700">Corners</h3>
+              <ImageCornerRadius cornerRadius={cornerRadius} onCornerRadiusChange={onCornerRadiusChange} />
+            </div>
+          )}
         </div>
       )}
     </div>
