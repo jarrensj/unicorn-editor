@@ -12,7 +12,8 @@ export const processImageDownload = (
   backgroundImage: string | null,
   imageScale: number = 100, // Default scale is 100%
   squareFormat: boolean = true, // Parameter kept for compatibility but always used as true
-  cornerRadius: number = 0 // Corner radius parameter with default 0
+  imageCornerRadius: number = 0, // Corner radius for the uploaded image
+  frameCornerRadius: number = 0 // Corner radius for the entire frame
 ) => {
   if (!imageUrl || !imageElement) return;
   
@@ -27,16 +28,16 @@ export const processImageDownload = (
         const bgImg = new Image();
         bgImg.onload = () => {
           drawBackgroundImage(ctx, bgImg, canvas);
-          drawMainImage(ctx, imageElement, canvas, imageScale, cornerRadius);
-          finishDownload(canvas);
+          drawMainImage(ctx, imageElement, canvas, imageScale, imageCornerRadius);
+          finishDownload(canvas, frameCornerRadius);
         };
         
         bgImg.src = backgroundImage;
       } else {
         // Fill background color or use gradient
         drawBackground(ctx, canvas, selectedBackground);
-        drawMainImage(ctx, imageElement, canvas, imageScale, cornerRadius);
-        finishDownload(canvas);
+        drawMainImage(ctx, imageElement, canvas, imageScale, imageCornerRadius);
+        finishDownload(canvas, frameCornerRadius);
       }
     };
 
@@ -49,9 +50,32 @@ export const processImageDownload = (
 };
 
 // Handle the final steps of the download process
-const finishDownload = async (canvas: HTMLCanvasElement) => {
+const finishDownload = async (canvas: HTMLCanvasElement, frameCornerRadius: number = 0) => {
   try {
-    const blob = await canvasToBlob(canvas);
+    let finalCanvas = canvas;
+    
+    // If frame corner radius is specified, create a new canvas with rounded corners
+    if (frameCornerRadius > 0) {
+      const roundedCanvas = document.createElement("canvas");
+      const roundedCtx = roundedCanvas.getContext("2d");
+      
+      if (roundedCtx) {
+        roundedCanvas.width = canvas.width;
+        roundedCanvas.height = canvas.height;
+        
+        // Create clipping path with rounded corners
+        roundedCtx.beginPath();
+        roundedCtx.roundRect(0, 0, canvas.width, canvas.height, frameCornerRadius);
+        roundedCtx.clip();
+        
+        // Draw the original canvas onto the rounded canvas
+        roundedCtx.drawImage(canvas, 0, 0);
+        
+        finalCanvas = roundedCanvas;
+      }
+    }
+    
+    const blob = await canvasToBlob(finalCanvas);
     
     if (isMobileDevice()) {
       // Try web share API first
@@ -75,4 +99,3 @@ const finishDownload = async (canvas: HTMLCanvasElement) => {
     toast.error("Failed to process image!");
   }
 };
-

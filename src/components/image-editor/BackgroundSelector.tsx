@@ -14,8 +14,10 @@ type BackgroundSelectorProps = {
   imageScale?: number;
   onScaleChange?: (scale: number) => void;
   imageUrl: string | null;
-  cornerRadius?: number;
-  onCornerRadiusChange?: (radius: number) => void;
+  imageCornerRadius?: number;
+  frameCornerRadius?: number;
+  onImageCornerRadiusChange?: (radius: number) => void;
+  onFrameCornerRadiusChange?: (radius: number) => void;
 };
 
 const BackgroundSelector = ({ 
@@ -25,8 +27,10 @@ const BackgroundSelector = ({
   imageScale, 
   onScaleChange,
   imageUrl,
-  cornerRadius,
-  onCornerRadiusChange
+  imageCornerRadius,
+  frameCornerRadius,
+  onImageCornerRadiusChange,
+  onFrameCornerRadiusChange
 }: BackgroundSelectorProps) => {
   const [selectedId, setSelectedId] = useState("rainbow"); // Default to rainbow
   const [customImage, setCustomImage] = useState<string | null>(null);
@@ -143,10 +147,16 @@ const BackgroundSelector = ({
           )}
           
           {/* Corner toggle control */}
-          {cornerRadius !== undefined && onCornerRadiusChange && (
+          {imageCornerRadius !== undefined && frameCornerRadius !== undefined && 
+           onImageCornerRadiusChange && onFrameCornerRadiusChange && (
             <div>
               <h3 className="text-sm font-medium mb-2 text-gray-700">Corners</h3>
-              <ImageCornerRadius cornerRadius={cornerRadius} onCornerRadiusChange={onCornerRadiusChange} />
+              <ImageCornerRadius 
+                imageCornerRadius={imageCornerRadius} 
+                frameCornerRadius={frameCornerRadius}
+                onImageCornerRadiusChange={onImageCornerRadiusChange} 
+                onFrameCornerRadiusChange={onFrameCornerRadiusChange}
+              />
             </div>
           )}
         </div>

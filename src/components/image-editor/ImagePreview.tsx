@@ -9,7 +9,8 @@ type ImagePreviewProps = {
   backgroundImage: string | null;
   onDownload: () => void;
   imageScale: number;
-  cornerRadius: number;
+  imageCornerRadius: number;
+  frameCornerRadius: number;
 };
 
 const ImagePreview = ({ 
@@ -18,7 +19,8 @@ const ImagePreview = ({
   backgroundImage,
   onDownload,
   imageScale,
-  cornerRadius
+  imageCornerRadius,
+  frameCornerRadius
 }: ImagePreviewProps) => {
   return (
     <div className="flex flex-col">
@@ -35,7 +37,13 @@ const ImagePreview = ({
         {/* Content wrapper with aspect ratio container for square format */}
         <div className="relative w-full h-full">
           <AspectRatio ratio={1/1} className="w-full h-full">
-            <div className="relative w-full h-full flex items-center justify-center">
+            <div 
+              className="relative w-full h-full flex items-center justify-center"
+              style={{
+                borderRadius: frameCornerRadius > 0 ? `${frameCornerRadius}px` : '0px',
+                overflow: 'hidden'
+              }}
+            >
               {/* Background Layer */}
               {backgroundImage && (
                 <div className="absolute inset-0" style={{ 
@@ -64,7 +72,7 @@ const ImagePreview = ({
                       transition: 'transform 0.2s ease-in-out',
                       maxWidth: '95%',
                       maxHeight: '95%',
-                      borderRadius: `${cornerRadius}px`
+                      borderRadius: `${imageCornerRadius}px`
                     }}
                   />
                 </div>
