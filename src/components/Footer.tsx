@@ -28,7 +28,7 @@ const Footer = () => {
               Discord
             </a>
             <a 
-              href="https://github.com/jarrensj" 
+              href="https://github.com/jarrensj/unicorn-editor" 
               target="_blank" 
               rel="noopener noreferrer"
               className="text-gray-600 hover:text-unicorn-purple transition-colors"
