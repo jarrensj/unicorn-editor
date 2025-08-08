@@ -5,6 +5,8 @@ import FloatingOrbs from "./hero/FloatingOrbs";
 import HeroContent from "./hero/HeroContent";
 import ImageUploader from "./image-editor/ImageUploader";
 import { useMousePosition } from "@/hooks/useMousePosition";
+import { combineImages } from "@/utils/image/processor/canvas";
+import { toast } from "sonner";
 
 type HeroSectionProps = {
   onImageUploaded: (imageDataUrl: string) => void;
@@ -19,6 +21,19 @@ const HeroSection = ({ onImageUploaded }: HeroSectionProps) => {
     setUploadedImage(imageDataUrl);
     onImageUploaded(imageDataUrl);
   };
+
+  const handleDualImageUpload = async (image1: string, image2: string) => {
+    try {
+      toast.info("Combining images...");
+      const combinedImage = await combineImages(image1, image2);
+      setUploadedImage(combinedImage);
+      onImageUploaded(combinedImage);
+      toast.success("Images combined successfully!");
+    } catch (error) {
+      console.error("Error combining images:", error);
+      toast.error("Failed to combine images. Please try again.");
+    }
+  };
   
   return (
     <div 
@@ -28,7 +43,10 @@ const HeroSection = ({ onImageUploaded }: HeroSectionProps) => {
       <HeroContent />
       
       {/* Always show the ImageUploader, not conditionally */}
-      <ImageUploader onImageUpload={handleImageUpload} />
+      <ImageUploader 
+        onImageUpload={handleImageUpload} 
+        onDualImageUpload={handleDualImageUpload}
+      />
       
       <FloatingOrbs mousePosition={mousePosition} />
     </div>

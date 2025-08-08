@@ -185,3 +185,68 @@ export const drawMainImage = (
   // Restore context state
   ctx.restore();
 };
+
+// Combine two images side by side into a single image
+export const combineImages = (
+  image1DataUrl: string,
+  image2DataUrl: string
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img1 = new Image();
+    const img2 = new Image();
+    let loadedCount = 0;
+    
+    const onImageLoad = () => {
+      loadedCount++;
+      if (loadedCount === 2) {
+        try {
+          // Calculate dimensions for side-by-side layout with gap
+          const gap = 20; // 20px gap between images
+          const maxHeight = Math.max(img1.height, img2.height);
+          const totalWidth = img1.width + img2.width + gap;
+          
+          // Create canvas for combined image
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          if (!ctx) {
+            reject(new Error('Failed to get canvas context'));
+            return;
+          }
+          
+          canvas.width = totalWidth;
+          canvas.height = maxHeight;
+          
+          // Keep background transparent - don't fill with any color
+          // The gap between images will be transparent
+          
+          // Draw first image on the left
+          const img1Y = (maxHeight - img1.height) / 2;
+          ctx.drawImage(img1, 0, img1Y);
+          
+          // Draw second image on the right (with gap)
+          const img2Y = (maxHeight - img2.height) / 2;
+          ctx.drawImage(img2, img1.width + gap, img2Y);
+          
+          // Convert to data URL
+          const combinedDataUrl = canvas.toDataURL('image/png');
+          resolve(combinedDataUrl);
+        } catch (error) {
+          reject(error);
+        }
+      }
+    };
+    
+    const onImageError = () => {
+      reject(new Error('Failed to load one or both images'));
+    };
+    
+    img1.onload = onImageLoad;
+    img1.onerror = onImageError;
+    img2.onload = onImageLoad;
+    img2.onerror = onImageError;
+    
+    img1.src = image1DataUrl;
+    img2.src = image2DataUrl;
+  });
+};

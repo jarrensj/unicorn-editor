@@ -69,7 +69,7 @@ const Index = () => {
 
       {/* Keep the floating decorative elements with animations */}
       <motion.div
-        className="fixed w-12 h-12 rounded-full bg-unicorn-purpleLight blur-xl opacity-70 float-slow"
+        className="fixed w-12 h-12 rounded-full bg-unicorn-purpleLight blur-xl opacity-70 float-slow pointer-events-none"
         animate={{
           x: [0, 100, 50, 150, 0],
           y: [0, 50, 100, 50, 0],
@@ -85,7 +85,7 @@ const Index = () => {
       />
       
       <motion.div
-        className="fixed w-10 h-10 rounded-full bg-unicorn-pink blur-xl opacity-70 float"
+        className="fixed w-10 h-10 rounded-full bg-unicorn-pink blur-xl opacity-70 float pointer-events-none"
         animate={{
           x: [0, -70, -140, -70, 0],
           y: [0, 100, 50, 150, 0],
@@ -101,7 +101,7 @@ const Index = () => {
       />
       
       <motion.div
-        className="fixed w-14 h-14 rounded-full bg-unicorn-skyBlue blur-xl opacity-70 float-fast"
+        className="fixed w-14 h-14 rounded-full bg-unicorn-skyBlue blur-xl opacity-70 float-fast pointer-events-none"
         animate={{
           x: [0, 80, 40, 120, 0],
           y: [0, -80, -40, -120, 0],
@@ -118,7 +118,7 @@ const Index = () => {
       
       {/* Additional decorative elements with enhanced animations */}
       <motion.div
-        className="fixed w-8 h-8 rounded-full bg-unicorn-magenta blur-xl opacity-60 float"
+        className="fixed w-8 h-8 rounded-full bg-unicorn-magenta blur-xl opacity-60 float pointer-events-none"
         animate={{
           x: [0, -50, -100, -50, 0],
           y: [0, -30, -60, -30, 0],
@@ -134,7 +134,7 @@ const Index = () => {
       />
       
       <motion.div
-        className="fixed w-10 h-10 rounded-full bg-unicorn-blue blur-xl opacity-50 float-slow"
+        className="fixed w-10 h-10 rounded-full bg-unicorn-blue blur-xl opacity-50 float-slow pointer-events-none"
         animate={{
           x: [0, 120, 60, 180, 0],
           y: [0, 70, 140, 70, 0],
