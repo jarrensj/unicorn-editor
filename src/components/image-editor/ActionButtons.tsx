@@ -5,21 +5,25 @@ import { handleImageAction } from "@/utils/image/processor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { createCanvas, drawBackgroundImage, drawMainImage, drawBackground } from "@/utils/image/processor/canvas";
 
-type ActionButtonsProps = {
+export type ActionButtonsComponentProps = {
   imageUrl: string | null;
   onDownload: () => void;
   selectedBackground: string;
   backgroundImage: string | null;
   imageScale: number;
+  canvasWidth: number;
+  canvasHeight: number;
 };
 
-const ActionButtons = ({ 
+const ActionButtons: React.FC<ActionButtonsComponentProps> = ({ 
   imageUrl, 
   onDownload,
   selectedBackground,
   backgroundImage,
-  imageScale
-}: ActionButtonsProps) => {
+  imageScale,
+  canvasWidth,
+  canvasHeight
+}: ActionButtonsComponentProps) => {
   const isMobile = useIsMobile();
   
   const handleCopyToClipboard = () => {
@@ -27,7 +31,7 @@ const ActionButtons = ({
     
     const img = new Image();
     img.onload = () => {
-      const { canvas, ctx } = createCanvas(img, true);
+      const { canvas, ctx } = createCanvas(img, true, { width: canvasWidth, height: canvasHeight });
       
       // Process the image with background
       if (backgroundImage) {
