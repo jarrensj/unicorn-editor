@@ -162,9 +162,18 @@ const ImageUploader = ({ onImageUpload, onDualImageUpload }: ImageUploaderProps)
   
   return (
     <div className={`mt-8 w-full relative z-50 ${isDualMode ? 'max-w-4xl' : 'max-w-xl'}`}>
-      {/* Mode Toggle - Subtle */}
-      <div className="flex justify-center mb-6">
-        <div className="flex bg-gray-50 rounded-lg p-0.5 relative z-50">
+      {/* Mode Toggle */}
+      <div className="flex justify-end mb-3">
+        {!isDualMode ? (
+          <button
+            onClick={() => {
+              setIsDualMode(true);
+            }}
+            className="text-xs text-gray-400 hover:text-gray-600 underline-offset-2 hover:underline"
+          >
+            Dual mode
+          </button>
+        ) : (
           <button
             onClick={() => {
               setIsDualMode(false);
@@ -174,27 +183,11 @@ const ImageUploader = ({ onImageUpload, onDualImageUpload }: ImageUploaderProps)
                 onImageUpload(firstImage);
               }
             }}
-            className={`px-4 py-2 rounded-md text-xs font-medium transition-all duration-200 relative z-50 ${
-              !isDualMode 
-                ? "bg-white text-gray-900 shadow-sm" 
-                : "text-gray-500 hover:text-gray-700"
-            }`}
+            className="text-xs text-gray-400 hover:text-gray-600 underline-offset-2 hover:underline"
           >
             Single
           </button>
-          <button
-            onClick={() => {
-              setIsDualMode(true);
-            }}
-            className={`px-4 py-2 rounded-md text-xs font-medium transition-all duration-200 relative z-50 ${
-              isDualMode 
-                ? "bg-white text-gray-900 shadow-sm" 
-                : "text-gray-500 hover:text-gray-700"
-            }`}
-          >
-            Dual
-          </button>
-        </div>
+        )}
       </div>
 
       {!isDualMode ? (
