@@ -93,6 +93,8 @@ const ImagePreview = ({
         selectedBackground={selectedBackground}
         backgroundImage={backgroundImage}
         imageScale={imageScale}
+        imageCornerRadius={imageCornerRadius}
+        frameCornerRadius={frameCornerRadius}
         canvasWidth={canvasWidth}
         canvasHeight={canvasHeight}
       />
