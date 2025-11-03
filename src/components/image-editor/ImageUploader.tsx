@@ -12,6 +12,7 @@ const ImageUploader = ({ onImageUpload }: ImageUploaderProps) => {
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [hasUploadedImage, setHasUploadedImage] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   
   // Reset main image state on mount, but keep background images
   useEffect(() => {
@@ -66,7 +67,9 @@ const ImageUploader = ({ onImageUpload }: ImageUploaderProps) => {
   
   const processFile = (file: File) => {
     if (!file.type.match('image.*')) {
-      toast.error("Please select an image file!");
+      const error = "Please select an image file!";
+      setErrorMessage(error);
+      toast.error(error);
       return;
     }
     
@@ -78,12 +81,15 @@ const ImageUploader = ({ onImageUpload }: ImageUploaderProps) => {
           sessionStorage.setItem('imageUploaded', 'true');
           sessionStorage.setItem('image', e.target.result);
           setHasUploadedImage(true);
+          setErrorMessage(null); // Clear error on success
           
           // Pass the image data to the parent component
           onImageUpload(e.target.result);
         } catch (error) {
           console.error('Error processing image:', error);
-          toast.error("Image too large to process. Try a smaller image.");
+          const errorMsg = "Image too large to process. Try a smaller image.";
+          setErrorMessage(errorMsg);
+          toast.error(errorMsg);
         }
       }
     };
@@ -155,6 +161,12 @@ const ImageUploader = ({ onImageUpload }: ImageUploaderProps) => {
             >
               {hasUploadedImage ? "Replace Image" : "Select Image"}
             </Button>
+            
+            {errorMessage && (
+              <p className="text-sm text-red-500 mt-3 font-medium">
+                {errorMessage}
+              </p>
+            )}
           </div>
           
           <p className="text-sm text-gray-400 mt-4">
