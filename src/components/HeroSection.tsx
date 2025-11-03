@@ -24,7 +24,7 @@ const HeroSection = ({ onImageUploaded }: HeroSectionProps) => {
 
   const handleDualImageUpload = async (image1: string, image2: string) => {
     try {
-      toast.info("Combining images...");
+      toast.info("Combining images?");
       const combinedImage = await combineImages(image1, image2, 0); // Initial combination with no corner radius
       setUploadedImage(combinedImage);
       onImageUploaded(combinedImage, true, { image1, image2 });

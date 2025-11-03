@@ -29,7 +29,7 @@ const NotFound = () => {
         
         <h1 className="text-6xl font-bold mb-4 unicorn-text-gradient">Oops!</h1>
         <h2 className="text-4xl font-semibold mb-6 text-unicorn-purpleDark">
-          This unicorn seems lost...
+          This unicorn seems lost…
         </h2>
         
         <p className="text-xl text-gray-600 mb-8 max-w-md mx-auto">
