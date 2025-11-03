@@ -15,6 +15,7 @@ export type ActionButtonsComponentProps = {
   frameCornerRadius: number;
   canvasWidth: number;
   canvasHeight: number;
+  isDualMode?: boolean;
 };
 
 const ActionButtons: React.FC<ActionButtonsComponentProps> = ({ 
@@ -26,7 +27,8 @@ const ActionButtons: React.FC<ActionButtonsComponentProps> = ({
   imageCornerRadius,
   frameCornerRadius,
   canvasWidth,
-  canvasHeight
+  canvasHeight,
+  isDualMode = false
 }: ActionButtonsComponentProps) => {
   const isMobile = useIsMobile();
   
@@ -42,7 +44,8 @@ const ActionButtons: React.FC<ActionButtonsComponentProps> = ({
         const bgImg = new Image();
         bgImg.onload = () => {
           drawBackgroundImage(ctx, bgImg, canvas);
-          drawMainImage(ctx, img, canvas, imageScale, imageCornerRadius);
+          // In dual mode, corner radius is already applied to individual images
+          drawMainImage(ctx, img, canvas, imageScale, isDualMode ? 0 : imageCornerRadius);
           
           // Apply frame corner radius if specified
           if (frameCornerRadius > 0) {
@@ -72,7 +75,8 @@ const ActionButtons: React.FC<ActionButtonsComponentProps> = ({
         bgImg.src = backgroundImage;
       } else {
         drawBackground(ctx, canvas, selectedBackground);
-        drawMainImage(ctx, img, canvas, imageScale, imageCornerRadius);
+        // In dual mode, corner radius is already applied to individual images
+        drawMainImage(ctx, img, canvas, imageScale, isDualMode ? 0 : imageCornerRadius);
         
         // Apply frame corner radius if specified
         if (frameCornerRadius > 0) {

@@ -82,6 +82,7 @@ const ImageEditor = ({ initialImageUrl, isDualMode = false, originalImages = nul
   
   const handleDownload = () => {
     // Pass target size and both corner radius values
+    // In dual mode, corner radius is already applied to individual images, so pass 0
     processImageDownload(
       imageUrl,
       imageElement,
@@ -89,7 +90,7 @@ const ImageEditor = ({ initialImageUrl, isDualMode = false, originalImages = nul
       backgroundImage,
       imageScale,
       true,
-      imageCornerRadius,
+      isDualMode ? 0 : imageCornerRadius,
       frameCornerRadius,
       { width: canvasSize.width, height: canvasSize.height }
     );
@@ -122,6 +123,7 @@ const ImageEditor = ({ initialImageUrl, isDualMode = false, originalImages = nul
               frameCornerRadius={frameCornerRadius}
               canvasWidth={canvasSize.width}
               canvasHeight={canvasSize.height}
+              isDualMode={isDualMode}
             />
             <div>
               <h3 className="text-xl font-semibold mb-4">Background Options</h3>
