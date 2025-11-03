@@ -218,7 +218,7 @@ export const drawMainImage = (
   ctx.restore();
 };
 
-// Helper function to create a rounded rectangle path
+// Helper function to create a rounded rectangle path with all 4 corners
 const roundRectPath = (
   ctx: CanvasRenderingContext2D,
   x: number,
@@ -227,16 +227,28 @@ const roundRectPath = (
   height: number,
   radius: number
 ): void => {
+  // Ensure radius doesn't exceed half of width or height
+  const r = Math.min(radius, width / 2, height / 2);
+  
   ctx.beginPath();
-  ctx.moveTo(x + radius, y);
-  ctx.lineTo(x + width - radius, y);
-  ctx.arcTo(x + width, y, x + width, y + radius, radius);
-  ctx.lineTo(x + width, y + height - radius);
-  ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
-  ctx.lineTo(x + radius, y + height);
-  ctx.arcTo(x, y + height, x, y + height - radius, radius);
-  ctx.lineTo(x, y + radius);
-  ctx.arcTo(x, y, x + radius, y, radius);
+  // Start from top-left corner (after the radius)
+  ctx.moveTo(x + r, y);
+  // Top edge
+  ctx.lineTo(x + width - r, y);
+  // Top-right corner
+  ctx.arc(x + width - r, y + r, r, -Math.PI / 2, 0);
+  // Right edge
+  ctx.lineTo(x + width, y + height - r);
+  // Bottom-right corner
+  ctx.arc(x + width - r, y + height - r, r, 0, Math.PI / 2);
+  // Bottom edge
+  ctx.lineTo(x + r, y + height);
+  // Bottom-left corner
+  ctx.arc(x + r, y + height - r, r, Math.PI / 2, Math.PI);
+  // Left edge
+  ctx.lineTo(x, y + r);
+  // Top-left corner
+  ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
   ctx.closePath();
 };
 
