@@ -253,24 +253,26 @@ export const combineImages = (
           // Keep background transparent - don't fill with any color
           // The gap between images will be transparent
           
-          // Draw first image on the left with corner radius
+          // Draw first image on the left with corner radius (all 4 corners)
           const img1Y = (maxHeight - img1.height) / 2;
           ctx.save();
           if (cornerRadius > 0) {
             ctx.beginPath();
-            ctx.roundRect(0, img1Y, img1.width, img1.height, cornerRadius);
+            // Explicitly round all 4 corners
+            ctx.roundRect(0, img1Y, img1.width, img1.height, [cornerRadius, cornerRadius, cornerRadius, cornerRadius]);
             ctx.clip();
           }
           ctx.drawImage(img1, 0, img1Y);
           ctx.restore();
           
-          // Draw second image on the right (with gap) with corner radius
+          // Draw second image on the right (with gap) with corner radius (all 4 corners)
           const img2Y = (maxHeight - img2.height) / 2;
           const img2X = img1.width + gap;
           ctx.save();
           if (cornerRadius > 0) {
             ctx.beginPath();
-            ctx.roundRect(img2X, img2Y, img2.width, img2.height, cornerRadius);
+            // Explicitly round all 4 corners
+            ctx.roundRect(img2X, img2Y, img2.width, img2.height, [cornerRadius, cornerRadius, cornerRadius, cornerRadius]);
             ctx.clip();
           }
           ctx.drawImage(img2, img2X, img2Y);
