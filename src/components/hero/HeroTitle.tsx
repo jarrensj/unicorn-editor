@@ -2,13 +2,19 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const HeroTitle = () => {
   const [clickCount, setClickCount] = useState(0);
   const isOpen = clickCount >= 3;
+  const navigate = useNavigate();
 
   const handleExclusiveClick = () => {
     setClickCount(prev => prev + 1);
+  };
+
+  const handleWhisperClick = () => {
+    navigate('/qr-code-generator');
   };
 
   return (
@@ -50,7 +56,10 @@ const HeroTitle = () => {
               <motion.span
                 initial={{ opacity: 0, y: -20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="inline-block text-3xl"
+                className="inline-block text-3xl cursor-pointer"
+                onClick={handleWhisperClick}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
               >
                 🤫🤫🤫
               </motion.span>
