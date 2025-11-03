@@ -1,5 +1,6 @@
 
 import { ExternalLink } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -19,6 +20,12 @@ const Footer = () => {
           <div className="w-full max-w-md h-px bg-gradient-to-r from-transparent via-unicorn-purple/30 to-transparent mb-8"></div>
           
           <div className="flex flex-wrap gap-x-8 gap-y-4 justify-center mb-8">
+            <Link 
+              to="/qr-code-generator"
+              className="text-gray-600 hover:text-unicorn-purple transition-colors"
+            >
+              QR Code Generator
+            </Link>
             <a 
               href="https://discord.gg/omakase" 
               target="_blank" 
