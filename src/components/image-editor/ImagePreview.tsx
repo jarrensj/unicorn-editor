@@ -1,7 +1,7 @@
 
 import React from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import ActionButtons from "./ActionButtons";
+import ActionButtons, { type ActionButtonsComponentProps } from "./ActionButtons";
 
 type ImagePreviewProps = {
   imageUrl: string | null;
@@ -11,6 +11,8 @@ type ImagePreviewProps = {
   imageScale: number;
   imageCornerRadius: number;
   frameCornerRadius: number;
+  canvasWidth: number;
+  canvasHeight: number;
 };
 
 const ImagePreview = ({ 
@@ -20,7 +22,9 @@ const ImagePreview = ({
   onDownload,
   imageScale,
   imageCornerRadius,
-  frameCornerRadius
+  frameCornerRadius,
+  canvasWidth,
+  canvasHeight
 }: ImagePreviewProps) => {
   return (
     <div className="flex flex-col">
@@ -34,9 +38,9 @@ const ImagePreview = ({
           position: "relative"
         }}
       >
-        {/* Content wrapper with aspect ratio container for square format */}
+        {/* Content wrapper with aspect ratio container */}
         <div className="relative w-full h-full">
-          <AspectRatio ratio={1/1} className="w-full h-full">
+          <AspectRatio ratio={canvasWidth / canvasHeight} className="w-full h-full">
             <div 
               className="relative w-full h-full flex items-center justify-center"
               style={{
@@ -89,6 +93,10 @@ const ImagePreview = ({
         selectedBackground={selectedBackground}
         backgroundImage={backgroundImage}
         imageScale={imageScale}
+        imageCornerRadius={imageCornerRadius}
+        frameCornerRadius={frameCornerRadius}
+        canvasWidth={canvasWidth}
+        canvasHeight={canvasHeight}
       />
     </div>
   );

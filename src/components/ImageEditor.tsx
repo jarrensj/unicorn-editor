@@ -5,6 +5,7 @@ import BackgroundSelector from "./image-editor/BackgroundSelector";
 import ImagePreview from "./image-editor/ImagePreview";
 import EditorHeading from "./image-editor/EditorHeading";
 import { processImageDownload } from "@/utils/imageProcessor"; // Keeping original import path for backward compatibility
+import CanvasSizeSelector, { type CanvasSize } from "./image-editor/CanvasSizeSelector";
 
 type ImageEditorProps = {
   initialImageUrl?: string | null;
@@ -19,6 +20,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   const [imageScale, setImageScale] = useState<number>(85); // Default to 85% scale to ensure it fits
   const [imageCornerRadius, setImageCornerRadius] = useState<number>(0); // Corner radius for the uploaded image
   const [frameCornerRadius, setFrameCornerRadius] = useState<number>(0); // Corner radius for the entire frame
+  const [canvasSize, setCanvasSize] = useState<CanvasSize>({ id: "1080x1080", label: "1080×1080", width: 1080, height: 1080 });
   
   // Load the image from props only, not localStorage
   useEffect(() => {
@@ -55,8 +57,18 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   };
   
   const handleDownload = () => {
-    // Always use square format (true) and pass both corner radius values
-    processImageDownload(imageUrl, imageElement, selectedBackground, backgroundImage, imageScale, true, imageCornerRadius, frameCornerRadius);
+    // Pass target size and both corner radius values
+    processImageDownload(
+      imageUrl,
+      imageElement,
+      selectedBackground,
+      backgroundImage,
+      imageScale,
+      true,
+      imageCornerRadius,
+      frameCornerRadius,
+      { width: canvasSize.width, height: canvasSize.height }
+    );
   };
   
   return (
@@ -84,9 +96,14 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
               imageScale={imageScale}
               imageCornerRadius={imageCornerRadius}
               frameCornerRadius={frameCornerRadius}
+              canvasWidth={canvasSize.width}
+              canvasHeight={canvasSize.height}
             />
             <div>
               <h3 className="text-xl font-semibold mb-4">Background Options</h3>
+              <div className="mb-6">
+                <CanvasSizeSelector value={canvasSize} onChange={setCanvasSize} />
+              </div>
               <BackgroundSelector 
                 onSelect={handleBackgroundChange} 
                 onImageUpload={handleBackgroundImageUpload}

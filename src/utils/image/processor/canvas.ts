@@ -2,7 +2,8 @@
 // Helper functions for canvas operations
 export const createCanvas = (
   imageElement: HTMLImageElement,
-  squareFormat: boolean = true
+  squareFormat: boolean = true,
+  targetSize?: { width: number; height: number }
 ): { canvas: HTMLCanvasElement; ctx: CanvasRenderingContext2D; width: number; height: number } => {
   const canvas = document.createElement("canvas");
   const ctx = canvas.getContext("2d");
@@ -11,18 +12,26 @@ export const createCanvas = (
     throw new Error("Failed to get canvas context");
   }
   
-  // Set canvas dimensions based on original image
+  // Set canvas dimensions based on provided target or original image
   let width = imageElement.width;
   let height = imageElement.height;
 
-  // If square format is requested, use the larger dimension
-  if (squareFormat) {
+  // Priority: targetSize first, then squareFormat, then original dimensions
+  if (targetSize && targetSize.width > 0 && targetSize.height > 0) {
+    // Use the exact target dimensions specified
+    canvas.width = targetSize.width;
+    canvas.height = targetSize.height;
+    width = targetSize.width;
+    height = targetSize.height;
+  } else if (squareFormat) {
+    // Square format - use the larger dimension
     const size = Math.max(width, height);
     canvas.width = size;
     canvas.height = size;
     width = size;
     height = size;
   } else {
+    // Use original image dimensions
     canvas.width = width;
     canvas.height = height;
   }
@@ -144,29 +153,52 @@ export const drawMainImage = (
   imageScale: number = 100,
   cornerRadius: number = 0
 ): void => {
-  // Apply scaling when drawing the main image
+  // Exactly match the preview CSS behavior:
+  // 1. object-contain (fit image in container maintaining aspect ratio)
+  // 2. maxWidth: 95%, maxHeight: 95% (constrain to 95% of container)  
+  // 3. transform: scale(imageScale/100) (apply user scale on top)
+  
   const scaleFactor = imageScale / 100;
   
-  // Calculate dimensions to ensure image fits within the canvas
-  const maxWidth = canvas.width * 0.95; // 95% of canvas width
-  const maxHeight = canvas.height * 0.95; // 95% of canvas height
+  // Step 1: object-contain behavior - fit image in canvas maintaining aspect ratio
+  const imageAspect = img.width / img.height;
+  const canvasAspect = canvas.width / canvas.height;
   
-  let scaledWidth = img.width * scaleFactor;
-  let scaledHeight = img.height * scaleFactor;
+  let containedWidth, containedHeight;
   
-  // If image is too large even after scaling, adjust further
-  if (scaledWidth > maxWidth || scaledHeight > maxHeight) {
-    const widthRatio = maxWidth / scaledWidth;
-    const heightRatio = maxHeight / scaledHeight;
-    const additionalScale = Math.min(widthRatio, heightRatio);
-    
-    scaledWidth *= additionalScale;
-    scaledHeight *= additionalScale;
+  if (imageAspect > canvasAspect) {
+    // Image is wider - fit by width
+    containedWidth = canvas.width;
+    containedHeight = canvas.width / imageAspect;
+  } else {
+    // Image is taller - fit by height
+    containedHeight = canvas.height;
+    containedWidth = canvas.height * imageAspect;
   }
   
-  // Position the image in the center of the canvas
-  const offsetX = (canvas.width - scaledWidth) / 2;
-  const offsetY = (canvas.height - scaledHeight) / 2;
+  // Step 2: Apply 95% constraint (like CSS maxWidth/maxHeight: 95%)
+  const maxWidth = canvas.width * 0.95;
+  const maxHeight = canvas.height * 0.95;
+  
+  if (containedWidth > maxWidth) {
+    const ratio = maxWidth / containedWidth;
+    containedWidth = maxWidth;
+    containedHeight *= ratio;
+  }
+  
+  if (containedHeight > maxHeight) {
+    const ratio = maxHeight / containedHeight;
+    containedHeight = maxHeight;
+    containedWidth *= ratio;
+  }
+  
+  // Step 3: Apply user scale (like CSS transform: scale())
+  const finalWidth = containedWidth * scaleFactor;
+  const finalHeight = containedHeight * scaleFactor;
+  
+  // Center the image
+  const offsetX = (canvas.width - finalWidth) / 2;
+  const offsetY = (canvas.height - finalHeight) / 2;
   
   // Save the current context state
   ctx.save();
@@ -175,12 +207,12 @@ export const drawMainImage = (
   if (cornerRadius > 0) {
     // Create a clipping path with rounded corners
     ctx.beginPath();
-    ctx.roundRect(offsetX, offsetY, scaledWidth, scaledHeight, cornerRadius);
+    ctx.roundRect(offsetX, offsetY, finalWidth, finalHeight, cornerRadius);
     ctx.clip();
   }
   
   // Draw image with scaling
-  ctx.drawImage(img, offsetX, offsetY, scaledWidth, scaledHeight);
+  ctx.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
   
   // Restore context state
   ctx.restore();

@@ -13,12 +13,13 @@ export const processImageDownload = (
   imageScale: number = 100, // Default scale is 100%
   squareFormat: boolean = true, // Parameter kept for compatibility but always used as true
   imageCornerRadius: number = 0, // Corner radius for the uploaded image
-  frameCornerRadius: number = 0 // Corner radius for the entire frame
+  frameCornerRadius: number = 0, // Corner radius for the entire frame
+  targetSize?: { width: number; height: number }
 ) => {
   if (!imageUrl || !imageElement) return;
   
   try {
-    const { canvas, ctx } = createCanvas(imageElement, squareFormat);
+    const { canvas, ctx } = createCanvas(imageElement, squareFormat, targetSize);
     
     // Create and process the image with background
     const processWithBackground = () => {
