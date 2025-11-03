@@ -31,6 +31,8 @@ const Index = () => {
   // State to track if an image is uploaded
   const [hasImage, setHasImage] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isDualMode, setIsDualMode] = useState(false);
+  const [originalImages, setOriginalImages] = useState<{ image1: string; image2: string } | null>(null);
   
   // Check sessionStorage on component mount - align with ImageUploader check
   useEffect(() => {
@@ -41,9 +43,11 @@ const Index = () => {
     setImageUrl(null);
   }, []);
   
-  const handleImageUpload = (imageDataUrl: string) => {
+  const handleImageUpload = (imageDataUrl: string, isDual?: boolean, originalImgs?: { image1: string; image2: string }) => {
     setImageUrl(imageDataUrl);
     setHasImage(true);
+    setIsDualMode(isDual || false);
+    setOriginalImages(originalImgs || null);
     sessionStorage.setItem('imageUploaded', 'true');
     sessionStorage.setItem('image', imageDataUrl);
     
@@ -62,7 +66,7 @@ const Index = () => {
       
       <main>
         <HeroSection onImageUploaded={handleImageUpload} />
-        {hasImage && <ImageEditor initialImageUrl={imageUrl} />}
+        {hasImage && <ImageEditor initialImageUrl={imageUrl} isDualMode={isDualMode} originalImages={originalImages} />}
       </main>
       
       <Footer />

@@ -6,12 +6,15 @@ import ImagePreview from "./image-editor/ImagePreview";
 import EditorHeading from "./image-editor/EditorHeading";
 import { processImageDownload } from "@/utils/imageProcessor"; // Keeping original import path for backward compatibility
 import CanvasSizeSelector, { type CanvasSize } from "./image-editor/CanvasSizeSelector";
+import { combineImages } from "@/utils/image/processor/canvas";
 
 type ImageEditorProps = {
   initialImageUrl?: string | null;
+  isDualMode?: boolean;
+  originalImages?: { image1: string; image2: string } | null;
 };
 
-const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
+const ImageEditor = ({ initialImageUrl, isDualMode = false, originalImages = null }: ImageEditorProps) => {
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl || null);
   // Update to use the first background option from BackgroundSelector
   const [selectedBackground, setSelectedBackground] = useState<string>("linear-gradient(135deg, #fef6ff, #ffebb8, #ffdee2, #d8f1ff)");
@@ -33,6 +36,27 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
       img.src = initialImageUrl;
     }
   }, [initialImageUrl]);
+  
+  // Recombine images when corner radius changes in dual mode
+  useEffect(() => {
+    if (isDualMode && originalImages) {
+      const recombine = async () => {
+        try {
+          const combined = await combineImages(originalImages.image1, originalImages.image2, imageCornerRadius);
+          setImageUrl(combined);
+          
+          // Update image element
+          const img = new Image();
+          img.onload = () => setImageElement(img);
+          img.src = combined;
+        } catch (error) {
+          console.error("Error recombining images:", error);
+        }
+      };
+      
+      recombine();
+    }
+  }, [imageCornerRadius, isDualMode, originalImages]);
   
   const handleBackgroundChange = (background: string) => {
     setSelectedBackground(background);

@@ -221,7 +221,8 @@ export const drawMainImage = (
 // Combine two images side by side into a single image
 export const combineImages = (
   image1DataUrl: string,
-  image2DataUrl: string
+  image2DataUrl: string,
+  cornerRadius: number = 0
 ): Promise<string> => {
   return new Promise((resolve, reject) => {
     const img1 = new Image();
@@ -252,13 +253,28 @@ export const combineImages = (
           // Keep background transparent - don't fill with any color
           // The gap between images will be transparent
           
-          // Draw first image on the left
+          // Draw first image on the left with corner radius
           const img1Y = (maxHeight - img1.height) / 2;
+          ctx.save();
+          if (cornerRadius > 0) {
+            ctx.beginPath();
+            ctx.roundRect(0, img1Y, img1.width, img1.height, cornerRadius);
+            ctx.clip();
+          }
           ctx.drawImage(img1, 0, img1Y);
+          ctx.restore();
           
-          // Draw second image on the right (with gap)
+          // Draw second image on the right (with gap) with corner radius
           const img2Y = (maxHeight - img2.height) / 2;
-          ctx.drawImage(img2, img1.width + gap, img2Y);
+          const img2X = img1.width + gap;
+          ctx.save();
+          if (cornerRadius > 0) {
+            ctx.beginPath();
+            ctx.roundRect(img2X, img2Y, img2.width, img2.height, cornerRadius);
+            ctx.clip();
+          }
+          ctx.drawImage(img2, img2X, img2Y);
+          ctx.restore();
           
           // Convert to data URL
           const combinedDataUrl = canvas.toDataURL('image/png');

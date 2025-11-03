@@ -9,7 +9,7 @@ import { combineImages } from "@/utils/image/processor/canvas";
 import { toast } from "sonner";
 
 type HeroSectionProps = {
-  onImageUploaded: (imageDataUrl: string) => void;
+  onImageUploaded: (imageDataUrl: string, isDual?: boolean, originalImages?: { image1: string; image2: string }) => void;
 };
 
 const HeroSection = ({ onImageUploaded }: HeroSectionProps) => {
@@ -19,15 +19,15 @@ const HeroSection = ({ onImageUploaded }: HeroSectionProps) => {
   
   const handleImageUpload = (imageDataUrl: string) => {
     setUploadedImage(imageDataUrl);
-    onImageUploaded(imageDataUrl);
+    onImageUploaded(imageDataUrl, false);
   };
 
   const handleDualImageUpload = async (image1: string, image2: string) => {
     try {
       toast.info("Combining images...");
-      const combinedImage = await combineImages(image1, image2);
+      const combinedImage = await combineImages(image1, image2, 0); // Initial combination with no corner radius
       setUploadedImage(combinedImage);
-      onImageUploaded(combinedImage);
+      onImageUploaded(combinedImage, true, { image1, image2 });
       toast.success("Images combined successfully!");
     } catch (error) {
       console.error("Error combining images:", error);
