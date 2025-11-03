@@ -218,6 +218,28 @@ export const drawMainImage = (
   ctx.restore();
 };
 
+// Helper function to create a rounded rectangle path
+const roundRectPath = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+): void => {
+  ctx.beginPath();
+  ctx.moveTo(x + radius, y);
+  ctx.lineTo(x + width - radius, y);
+  ctx.arcTo(x + width, y, x + width, y + radius, radius);
+  ctx.lineTo(x + width, y + height - radius);
+  ctx.arcTo(x + width, y + height, x + width - radius, y + height, radius);
+  ctx.lineTo(x + radius, y + height);
+  ctx.arcTo(x, y + height, x, y + height - radius, radius);
+  ctx.lineTo(x, y + radius);
+  ctx.arcTo(x, y, x + radius, y, radius);
+  ctx.closePath();
+};
+
 // Combine two images side by side into a single image
 export const combineImages = (
   image1DataUrl: string,
@@ -257,9 +279,7 @@ export const combineImages = (
           const img1Y = (maxHeight - img1.height) / 2;
           ctx.save();
           if (cornerRadius > 0) {
-            ctx.beginPath();
-            // Explicitly round all 4 corners
-            ctx.roundRect(0, img1Y, img1.width, img1.height, [cornerRadius, cornerRadius, cornerRadius, cornerRadius]);
+            roundRectPath(ctx, 0, img1Y, img1.width, img1.height, cornerRadius);
             ctx.clip();
           }
           ctx.drawImage(img1, 0, img1Y);
@@ -270,9 +290,7 @@ export const combineImages = (
           const img2X = img1.width + gap;
           ctx.save();
           if (cornerRadius > 0) {
-            ctx.beginPath();
-            // Explicitly round all 4 corners
-            ctx.roundRect(img2X, img2Y, img2.width, img2.height, [cornerRadius, cornerRadius, cornerRadius, cornerRadius]);
+            roundRectPath(ctx, img2X, img2Y, img2.width, img2.height, cornerRadius);
             ctx.clip();
           }
           ctx.drawImage(img2, img2X, img2Y);
