@@ -5,6 +5,7 @@ import QRCode from "react-qr-code"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 import { Download, X } from "lucide-react"
 
 export default function QRCodeGenerator() {
@@ -97,7 +98,10 @@ export default function QRCodeGenerator() {
     <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 p-6">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
-          <h1 className="text-4xl font-bold text-foreground mb-2">QR Code Generator</h1>
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <h1 className="text-4xl font-bold text-foreground">QR Code Generator</h1>
+            <Badge variant="secondary" className="text-xs">WIP</Badge>
+          </div>
           <p className="text-muted-foreground">Create custom QR codes for any URL or text</p>
         </div>
 
