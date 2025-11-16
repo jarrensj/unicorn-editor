@@ -76,14 +76,14 @@ const BackgroundSelector = ({
         if (e.target && typeof e.target.result === 'string') {
           const imageUrl = e.target.result;
           
-          // Save to state
-          setCustomImage(imageUrl);
-          
           // Add to saved backgrounds and get new ID
           const newImageId = addBackground(imageUrl);
-          setSelectedId(newImageId);
           
-          // Notify parent
+          // Set as selected
+          setSelectedId(newImageId);
+          setCustomImage(imageUrl);
+          
+          // Immediately apply to preview
           onImageUpload(imageUrl);
           
           // Reset the file input
