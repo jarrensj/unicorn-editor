@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from "react";
 import { useSavedBackgrounds } from "@/hooks/useSavedBackgrounds";
 import { useScrollIndicator } from "@/hooks/useScrollIndicator";
+import { LastSelectedBackground } from "@/hooks/useLastSelectedBackground";
 import BackgroundOptionsList from "./background/BackgroundOptionsList";
 import ImageScale from "./ImageScale";
 import ImageCornerRadius from "./ImageCornerRadius";
@@ -8,9 +9,10 @@ import { BackgroundOption } from "./background/StandardBackgroundOption";
 import { standardBackgroundOptions } from "./background/backgroundOptions";
 
 type BackgroundSelectorProps = {
-  onSelect: (background: string) => void;
-  onImageUpload: (imageUrl: string) => void;
+  onSelect: (background: string, backgroundId: string) => void;
+  onImageUpload: (imageUrl: string, imageId: string) => void;
   initialBackground?: string;
+  lastSelectedBackground?: LastSelectedBackground | null;
   imageScale?: number;
   onScaleChange?: (scale: number) => void;
   imageUrl: string | null;
@@ -23,7 +25,8 @@ type BackgroundSelectorProps = {
 const BackgroundSelector = ({ 
   onSelect, 
   onImageUpload, 
-  initialBackground, 
+  initialBackground,
+  lastSelectedBackground,
   imageScale, 
   onScaleChange,
   imageUrl,
@@ -32,8 +35,11 @@ const BackgroundSelector = ({
   onImageCornerRadiusChange,
   onFrameCornerRadiusChange
 }: BackgroundSelectorProps) => {
-  const [selectedId, setSelectedId] = useState("rainbow"); // Default to rainbow
-  const [customImage, setCustomImage] = useState<string | null>(null);
+  // Initialize with last selected background ID or default to rainbow
+  const [selectedId, setSelectedId] = useState(lastSelectedBackground?.id || "rainbow");
+  const [customImage, setCustomImage] = useState<string | null>(
+    lastSelectedBackground?.type === "custom" ? lastSelectedBackground.value : null
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { savedBackgrounds, addBackground, removeBackground } = useSavedBackgrounds();
   const { showScrollIndicator, scrollAreaRef } = useScrollIndicator();
@@ -46,16 +52,16 @@ const BackgroundSelector = ({
       if (matchingOption) {
         setSelectedId(matchingOption.id);
       }
-    } else if (imageUrl && standardBackgroundOptions.length > 0) {
-      // If no initialBackground provided but we have an image, use the first option
-      onSelect(standardBackgroundOptions[0].value);
+    } else if (imageUrl && standardBackgroundOptions.length > 0 && !lastSelectedBackground) {
+      // If no initialBackground and no lastSelectedBackground provided but we have an image, use the first option
+      onSelect(standardBackgroundOptions[0].value, standardBackgroundOptions[0].id);
     }
-  }, [initialBackground, onSelect, imageUrl]);
+  }, [initialBackground, onSelect, imageUrl, lastSelectedBackground]);
 
   const handleSelect = (option: BackgroundOption) => {
     setSelectedId(option.id);
     setCustomImage(null);
-    onSelect(option.value);
+    onSelect(option.value, option.id);
   };
 
   const handleCustomImageSelect = () => {
@@ -65,7 +71,7 @@ const BackgroundSelector = ({
   const handleSavedImageSelect = (imageUrl: string, id: string) => {
     setSelectedId(id);
     setCustomImage(imageUrl);
-    onImageUpload(imageUrl);
+    onImageUpload(imageUrl, id);
   };
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,8 +89,8 @@ const BackgroundSelector = ({
           const newImageId = addBackground(imageUrl);
           setSelectedId(newImageId);
           
-          // Notify parent
-          onImageUpload(imageUrl);
+          // Notify parent with the image ID
+          onImageUpload(imageUrl, newImageId);
           
           // Reset the file input
           if (fileInputRef.current) {
@@ -107,7 +113,7 @@ const BackgroundSelector = ({
       const defaultOption = standardBackgroundOptions[0];
       setSelectedId(defaultOption.id);
       setCustomImage(null);
-      onSelect(defaultOption.value);
+      onSelect(defaultOption.value, defaultOption.id);
     }
   };
   

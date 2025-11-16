@@ -6,16 +6,23 @@ import ImagePreview from "./image-editor/ImagePreview";
 import EditorHeading from "./image-editor/EditorHeading";
 import { processImageDownload } from "@/utils/imageProcessor"; // Keeping original import path for backward compatibility
 import CanvasSizeSelector, { type CanvasSize } from "./image-editor/CanvasSizeSelector";
+import { useLastSelectedBackground } from "@/hooks/useLastSelectedBackground";
 
 type ImageEditorProps = {
   initialImageUrl?: string | null;
 };
 
 const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
+  const { lastSelected, saveLastSelected } = useLastSelectedBackground();
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl || null);
-  // Update to use the first background option from BackgroundSelector
-  const [selectedBackground, setSelectedBackground] = useState<string>("linear-gradient(135deg, #fef6ff, #ffebb8, #ffdee2, #d8f1ff)");
-  const [backgroundImage, setBackgroundImage] = useState<string | null>(null);
+  
+  // Initialize with last selected background or default to rainbow gradient
+  const [selectedBackground, setSelectedBackground] = useState<string>(
+    lastSelected?.type === "standard" ? lastSelected.value : "linear-gradient(135deg, #fef6ff, #ffebb8, #ffdee2, #d8f1ff)"
+  );
+  const [backgroundImage, setBackgroundImage] = useState<string | null>(
+    lastSelected?.type === "custom" ? lastSelected.value : null
+  );
   const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
   const [imageScale, setImageScale] = useState<number>(85); // Default to 85% scale to ensure it fits
   const [imageCornerRadius, setImageCornerRadius] = useState<number>(0); // Corner radius for the uploaded image
@@ -34,14 +41,26 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
     }
   }, [initialImageUrl]);
   
-  const handleBackgroundChange = (background: string) => {
+  const handleBackgroundChange = (background: string, backgroundId: string) => {
     setSelectedBackground(background);
     setBackgroundImage(null);
+    // Save as last selected standard background
+    saveLastSelected({
+      type: "standard",
+      id: backgroundId,
+      value: background,
+    });
   };
 
-  const handleBackgroundImageUpload = (imageDataUrl: string) => {
+  const handleBackgroundImageUpload = (imageDataUrl: string, imageId: string) => {
     setBackgroundImage(imageDataUrl);
     setSelectedBackground('none');
+    // Save as last selected custom background
+    saveLastSelected({
+      type: "custom",
+      id: imageId,
+      value: imageDataUrl,
+    });
   };
   
   const handleScaleChange = (scale: number) => {
@@ -108,6 +127,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
                 onSelect={handleBackgroundChange} 
                 onImageUpload={handleBackgroundImageUpload}
                 initialBackground={selectedBackground}
+                lastSelectedBackground={lastSelected}
                 imageUrl={imageUrl}
                 imageScale={imageScale}
                 onScaleChange={handleScaleChange}
