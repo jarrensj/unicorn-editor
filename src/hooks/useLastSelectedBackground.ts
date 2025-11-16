@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 
 export type LastSelectedBackground = {
   type: "standard" | "custom";
@@ -8,20 +8,24 @@ export type LastSelectedBackground = {
 
 const LAST_SELECTED_BACKGROUND_KEY = "unicornLastSelectedBackground";
 
-export const useLastSelectedBackground = () => {
-  const [lastSelected, setLastSelected] = useState<LastSelectedBackground | null>(null);
-
-  // Load last selected background from localStorage on mount
-  useEffect(() => {
+// Helper function to load from localStorage synchronously
+const loadLastSelectedBackground = (): LastSelectedBackground | null => {
+  try {
     const saved = localStorage.getItem(LAST_SELECTED_BACKGROUND_KEY);
     if (saved) {
-      try {
-        setLastSelected(JSON.parse(saved));
-      } catch (e) {
-        console.error("Error parsing last selected background:", e);
-      }
+      return JSON.parse(saved);
     }
-  }, []);
+  } catch (e) {
+    console.error("Error parsing last selected background:", e);
+  }
+  return null;
+};
+
+export const useLastSelectedBackground = () => {
+  // Load synchronously during initialization
+  const [lastSelected, setLastSelected] = useState<LastSelectedBackground | null>(
+    loadLastSelectedBackground()
+  );
 
   // Save last selected background
   const saveLastSelected = (background: LastSelectedBackground) => {

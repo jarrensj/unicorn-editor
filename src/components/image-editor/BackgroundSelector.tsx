@@ -44,20 +44,6 @@ const BackgroundSelector = ({
   const { savedBackgrounds, addBackground, removeBackground } = useSavedBackgrounds();
   const { showScrollIndicator, scrollAreaRef } = useScrollIndicator();
 
-  // Set the initial background from props and match it to our options
-  useEffect(() => {
-    if (initialBackground && imageUrl) {
-      // Find if the initialBackground matches any of our options
-      const matchingOption = standardBackgroundOptions.find(option => option.value === initialBackground);
-      if (matchingOption) {
-        setSelectedId(matchingOption.id);
-      }
-    } else if (imageUrl && standardBackgroundOptions.length > 0 && !lastSelectedBackground) {
-      // If no initialBackground and no lastSelectedBackground provided but we have an image, use the first option
-      onSelect(standardBackgroundOptions[0].value, standardBackgroundOptions[0].id);
-    }
-  }, [initialBackground, onSelect, imageUrl, lastSelectedBackground]);
-
   const handleSelect = (option: BackgroundOption) => {
     setSelectedId(option.id);
     setCustomImage(null);
