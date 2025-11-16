@@ -31,6 +31,8 @@ const Index = () => {
   // State to track if an image is uploaded
   const [hasImage, setHasImage] = useState(false);
   const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [isDualMode, setIsDualMode] = useState(false);
+  const [originalImages, setOriginalImages] = useState<{ image1: string; image2: string } | null>(null);
   
   // Check sessionStorage on component mount - align with ImageUploader check
   useEffect(() => {
@@ -41,9 +43,11 @@ const Index = () => {
     setImageUrl(null);
   }, []);
   
-  const handleImageUpload = (imageDataUrl: string) => {
+  const handleImageUpload = (imageDataUrl: string, isDual?: boolean, originalImgs?: { image1: string; image2: string }) => {
     setImageUrl(imageDataUrl);
     setHasImage(true);
+    setIsDualMode(isDual || false);
+    setOriginalImages(originalImgs || null);
     sessionStorage.setItem('imageUploaded', 'true');
     sessionStorage.setItem('image', imageDataUrl);
     
@@ -62,14 +66,14 @@ const Index = () => {
       
       <main>
         <HeroSection onImageUploaded={handleImageUpload} />
-        {hasImage && <ImageEditor initialImageUrl={imageUrl} />}
+        {hasImage && <ImageEditor initialImageUrl={imageUrl} isDualMode={isDualMode} originalImages={originalImages} />}
       </main>
       
       <Footer />
 
       {/* Keep the floating decorative elements with animations */}
       <motion.div
-        className="fixed w-12 h-12 rounded-full bg-unicorn-purpleLight blur-xl opacity-70 float-slow"
+        className="fixed w-12 h-12 rounded-full bg-unicorn-purpleLight blur-xl opacity-70 float-slow pointer-events-none"
         animate={{
           x: [0, 100, 50, 150, 0],
           y: [0, 50, 100, 50, 0],
@@ -85,7 +89,7 @@ const Index = () => {
       />
       
       <motion.div
-        className="fixed w-10 h-10 rounded-full bg-unicorn-pink blur-xl opacity-70 float"
+        className="fixed w-10 h-10 rounded-full bg-unicorn-pink blur-xl opacity-70 float pointer-events-none"
         animate={{
           x: [0, -70, -140, -70, 0],
           y: [0, 100, 50, 150, 0],
@@ -101,7 +105,7 @@ const Index = () => {
       />
       
       <motion.div
-        className="fixed w-14 h-14 rounded-full bg-unicorn-skyBlue blur-xl opacity-70 float-fast"
+        className="fixed w-14 h-14 rounded-full bg-unicorn-skyBlue blur-xl opacity-70 float-fast pointer-events-none"
         animate={{
           x: [0, 80, 40, 120, 0],
           y: [0, -80, -40, -120, 0],
@@ -118,7 +122,7 @@ const Index = () => {
       
       {/* Additional decorative elements with enhanced animations */}
       <motion.div
-        className="fixed w-8 h-8 rounded-full bg-unicorn-magenta blur-xl opacity-60 float"
+        className="fixed w-8 h-8 rounded-full bg-unicorn-magenta blur-xl opacity-60 float pointer-events-none"
         animate={{
           x: [0, -50, -100, -50, 0],
           y: [0, -30, -60, -30, 0],
@@ -134,7 +138,7 @@ const Index = () => {
       />
       
       <motion.div
-        className="fixed w-10 h-10 rounded-full bg-unicorn-blue blur-xl opacity-50 float-slow"
+        className="fixed w-10 h-10 rounded-full bg-unicorn-blue blur-xl opacity-50 float-slow pointer-events-none"
         animate={{
           x: [0, 120, 60, 180, 0],
           y: [0, 70, 140, 70, 0],

@@ -217,3 +217,116 @@ export const drawMainImage = (
   // Restore context state
   ctx.restore();
 };
+
+// Helper function to create a rounded rectangle path with all 4 corners
+const roundRectPath = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  radius: number
+): void => {
+  // Ensure radius doesn't exceed half of width or height
+  const r = Math.min(radius, width / 2, height / 2);
+  
+  ctx.beginPath();
+  // Start from top-left corner (after the radius)
+  ctx.moveTo(x + r, y);
+  // Top edge
+  ctx.lineTo(x + width - r, y);
+  // Top-right corner
+  ctx.arc(x + width - r, y + r, r, -Math.PI / 2, 0);
+  // Right edge
+  ctx.lineTo(x + width, y + height - r);
+  // Bottom-right corner
+  ctx.arc(x + width - r, y + height - r, r, 0, Math.PI / 2);
+  // Bottom edge
+  ctx.lineTo(x + r, y + height);
+  // Bottom-left corner
+  ctx.arc(x + r, y + height - r, r, Math.PI / 2, Math.PI);
+  // Left edge
+  ctx.lineTo(x, y + r);
+  // Top-left corner
+  ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
+  ctx.closePath();
+};
+
+// Combine two images side by side into a single image
+export const combineImages = (
+  image1DataUrl: string,
+  image2DataUrl: string,
+  cornerRadius: number = 0
+): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const img1 = new Image();
+    const img2 = new Image();
+    let loadedCount = 0;
+    
+    const onImageLoad = () => {
+      loadedCount++;
+      if (loadedCount === 2) {
+        try {
+          // Calculate dimensions for side-by-side layout with gap
+          const gap = 20; // 20px gap between images
+          const maxHeight = Math.max(img1.height, img2.height);
+          const totalWidth = img1.width + img2.width + gap;
+          
+          // Create canvas for combined image
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+          
+          if (!ctx) {
+            reject(new Error('Failed to get canvas context'));
+            return;
+          }
+          
+          canvas.width = totalWidth;
+          canvas.height = maxHeight;
+          
+          // Keep background transparent - don't fill with any color
+          // The gap between images will be transparent
+          
+          // Draw first image on the left with corner radius (all 4 corners)
+          const img1Y = (maxHeight - img1.height) / 2;
+          ctx.save();
+          if (cornerRadius > 0) {
+            roundRectPath(ctx, 0, img1Y, img1.width, img1.height, cornerRadius);
+            ctx.clip();
+          }
+          ctx.drawImage(img1, 0, img1Y);
+          ctx.restore();
+          
+          // Draw second image on the right (with gap) with corner radius (all 4 corners)
+          const img2Y = (maxHeight - img2.height) / 2;
+          const img2X = img1.width + gap;
+          ctx.save();
+          if (cornerRadius > 0) {
+            roundRectPath(ctx, img2X, img2Y, img2.width, img2.height, cornerRadius);
+            ctx.clip();
+          }
+          ctx.drawImage(img2, img2X, img2Y);
+          ctx.restore();
+          
+          // Convert to data URL
+          const combinedDataUrl = canvas.toDataURL('image/png');
+          resolve(combinedDataUrl);
+        } catch (error) {
+          reject(error);
+        }
+      }
+    };
+    
+    const onImageError = () => {
+      reject(new Error('Failed to load one or both images'));
+    };
+    
+    img1.onload = onImageLoad;
+    img1.onerror = onImageError;
+    img2.onload = onImageLoad;
+    img2.onerror = onImageError;
+    
+    img1.src = image1DataUrl;
+    img2.src = image2DataUrl;
+  });
+};
