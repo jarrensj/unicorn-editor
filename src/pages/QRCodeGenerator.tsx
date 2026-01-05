@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Download, X } from "lucide-react"
+import Footer from "@/components/Footer"
 
 export default function QRCodeGenerator() {
   const [value, setValue] = useState("https://unicorneditor.com")
@@ -296,6 +297,8 @@ export default function QRCodeGenerator() {
           </Card>
         </div>
       </div>
+
+      <Footer />
     </div>
   )
 }
