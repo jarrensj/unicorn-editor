@@ -21,7 +21,7 @@ const PrivacyPolicy = () => {
 
           <h2>Introduction</h2>
           <p>
-            Unicorn Editor ("we", "our", or "the app") is committed to protecting your privacy. This Privacy Policy explains how we handle information when you use our mobile application.
+            Unicorn Editor ("we", "our", or "the app") is committed to protecting your privacy. This Privacy Policy explains how we handle information when you use our mobile or web application.
           </p>
 
           <h2>Summary</h2>
@@ -45,31 +45,38 @@ const PrivacyPolicy = () => {
 
           <h3>Custom Backgrounds</h3>
           <p>
-            When you upload custom background images, they are saved to your device's local storage (AsyncStorage) so you can reuse them. This data:
+            When you upload custom background images, they are saved to your device's local storage (AsyncStorage on mobile, or browser local storage on the web) so you can reuse them. This data:
           </p>
           <ul>
             <li>Never leaves your device</li>
             <li>Is not accessible to us or any third party</li>
-            <li>Can be deleted by removing the background from the app or uninstalling the app</li>
+            <li>Can be deleted by removing the background from the app, clearing your browser data, or uninstalling the app</li>
           </ul>
 
           <h3>Temporary Files</h3>
           <p>
-            During image export, temporary files may be created in your device's cache directory. These files:
+            During image export, temporary files may be created in your device's cache directory or browser temporary storage. These files:
           </p>
           <ul>
-            <li>Are automatically managed by your device's operating system</li>
-            <li>Are cleared when you clear app cache or uninstall the app</li>
+            <li>Are automatically managed by your device's operating system or browser</li>
+            <li>Are cleared when you clear your browser data, clear app cache, or uninstall the app</li>
           </ul>
 
-          <h2>Device Permissions</h2>
-          <p>The app requests the following permissions:</p>
+          <h2>Device and Browser Permissions</h2>
+          <p>The app may request the following permissions:</p>
 
-          <h3>Photo Library Access</h3>
+          <h3>Photo Library Access (Mobile)</h3>
           <ul>
             <li><strong>Purpose</strong>: To select images for editing and save edited images to your gallery</li>
             <li><strong>Usage</strong>: Only accessed when you choose to import or export images</li>
             <li><strong>Data handling</strong>: Images are processed locally on your device</li>
+          </ul>
+
+          <h3>File Access (Web)</h3>
+          <ul>
+            <li><strong>Purpose</strong>: To select images for editing and download edited images</li>
+            <li><strong>Usage</strong>: Only accessed when you choose to upload or download images via your browser's file picker</li>
+            <li><strong>Data handling</strong>: Images are processed locally in your browser</li>
           </ul>
 
           <h3>Camera Access (if applicable)</h3>
