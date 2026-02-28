@@ -1,12 +1,14 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
 import BackgroundSelector from "./image-editor/BackgroundSelector";
 import ImagePreview from "./image-editor/ImagePreview";
 import EditorHeading from "./image-editor/EditorHeading";
+import OverlayControls from "./image-editor/overlays/OverlayControls";
 import { processImageDownload } from "@/utils/imageProcessor"; // Keeping original import path for backward compatibility
 import CanvasSizeSelector, { type CanvasSize } from "./image-editor/CanvasSizeSelector";
 import { useLastSelectedBackground } from "@/hooks/useLastSelectedBackground";
+import type { Overlay } from "@/types/overlay";
 
 type ImageEditorProps = {
   initialImageUrl?: string | null;
@@ -15,7 +17,7 @@ type ImageEditorProps = {
 const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   const { lastSelected, saveLastSelected } = useLastSelectedBackground();
   const [imageUrl, setImageUrl] = useState<string | null>(initialImageUrl || null);
-  
+
   // Initialize with last selected background or default to rainbow gradient
   const [selectedBackground, setSelectedBackground] = useState<string>(
     lastSelected?.type === "standard" ? lastSelected.value : "linear-gradient(135deg, #fef6ff, #ffebb8, #ffdee2, #d8f1ff)"
@@ -28,19 +30,23 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   const [imageCornerRadius, setImageCornerRadius] = useState<number>(0); // Corner radius for the uploaded image
   const [frameCornerRadius, setFrameCornerRadius] = useState<number>(0); // Corner radius for the entire frame
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({ id: "1080x1080", label: "1080×1080", width: 1080, height: 1080 });
-  
+
+  // Overlay state
+  const [overlays, setOverlays] = useState<Overlay[]>([]);
+  const [selectedOverlayId, setSelectedOverlayId] = useState<string | null>(null);
+
   // Load the image from props only, not localStorage
   useEffect(() => {
     if (initialImageUrl) {
       setImageUrl(initialImageUrl);
-      
+
       // Create an image element to use for dimensions
       const img = new Image();
       img.onload = () => setImageElement(img);
       img.src = initialImageUrl;
     }
   }, [initialImageUrl]);
-  
+
   const handleBackgroundChange = (background: string, backgroundId: string) => {
     setSelectedBackground(background);
     setBackgroundImage(null);
@@ -62,11 +68,11 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
       value: imageDataUrl,
     });
   };
-  
+
   const handleScaleChange = (scale: number) => {
     setImageScale(scale);
   };
-  
+
   const handleImageCornerRadiusChange = (radius: number) => {
     setImageCornerRadius(radius);
   };
@@ -74,7 +80,35 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   const handleFrameCornerRadiusChange = (radius: number) => {
     setFrameCornerRadius(radius);
   };
-  
+
+  // Overlay handlers
+  const handleAddOverlay = useCallback((overlay: Overlay) => {
+    setOverlays((prev) => [...prev, overlay]);
+    setSelectedOverlayId(overlay.id);
+  }, []);
+
+  const handleUpdateOverlay = useCallback((id: string, updates: Partial<Overlay>) => {
+    setOverlays((prev) =>
+      prev.map((o) => (o.id === id ? { ...o, ...updates } : o))
+    );
+  }, []);
+
+  const handleDeleteOverlay = useCallback((id: string) => {
+    setOverlays((prev) => prev.filter((o) => o.id !== id));
+    if (selectedOverlayId === id) {
+      setSelectedOverlayId(null);
+    }
+  }, [selectedOverlayId]);
+
+  const handleClearOverlays = useCallback(() => {
+    setOverlays([]);
+    setSelectedOverlayId(null);
+  }, []);
+
+  const handleSelectOverlay = useCallback((id: string | null) => {
+    setSelectedOverlayId(id);
+  }, []);
+
   const handleDownload = () => {
     // Pass target size and both corner radius values
     processImageDownload(
@@ -86,19 +120,20 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
       true,
       imageCornerRadius,
       frameCornerRadius,
-      { width: canvasSize.width, height: canvasSize.height }
+      { width: canvasSize.width, height: canvasSize.height },
+      overlays
     );
   };
-  
+
   return (
     <section id="editor" className="py-20 px-4 relative overflow-hidden">
       {/* Background decorations */}
       <div className="absolute top-40 right-20 w-64 h-64 bg-unicorn-skyBlue/10 rounded-full blur-3xl -z-10" />
       <div className="absolute bottom-20 left-20 w-80 h-80 bg-unicorn-purple/10 rounded-full blur-3xl -z-10" />
-      
+
       <div className="max-w-4xl mx-auto">
         <EditorHeading />
-        
+
         <motion.div
           className="unicorn-card p-8 md:p-12"
           initial={{ opacity: 0, y: 30 }}
@@ -107,7 +142,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
           viewport={{ once: true, margin: "-100px" }}
         >
           <div className="grid gap-8 md:grid-cols-2">
-            <ImagePreview 
+            <ImagePreview
               imageUrl={imageUrl}
               selectedBackground={selectedBackground}
               backgroundImage={backgroundImage}
@@ -117,14 +152,19 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
               frameCornerRadius={frameCornerRadius}
               canvasWidth={canvasSize.width}
               canvasHeight={canvasSize.height}
+              overlays={overlays}
+              selectedOverlayId={selectedOverlayId}
+              onSelectOverlay={handleSelectOverlay}
+              onUpdateOverlay={handleUpdateOverlay}
+              onDeleteOverlay={handleDeleteOverlay}
             />
             <div>
               <h3 className="text-xl font-semibold mb-4">Background Options</h3>
               <div className="mb-6">
                 <CanvasSizeSelector value={canvasSize} onChange={setCanvasSize} />
               </div>
-              <BackgroundSelector 
-                onSelect={handleBackgroundChange} 
+              <BackgroundSelector
+                onSelect={handleBackgroundChange}
                 onImageUpload={handleBackgroundImageUpload}
                 initialBackground={selectedBackground}
                 lastSelectedBackground={lastSelected}
@@ -136,6 +176,20 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
                 onImageCornerRadiusChange={handleImageCornerRadiusChange}
                 onFrameCornerRadiusChange={handleFrameCornerRadiusChange}
               />
+
+              {/* Overlay controls - show when image is loaded */}
+              {imageUrl && (
+                <div className="mt-6">
+                  <OverlayControls
+                    overlays={overlays}
+                    selectedOverlayId={selectedOverlayId}
+                    onAddOverlay={handleAddOverlay}
+                    onUpdateOverlay={handleUpdateOverlay}
+                    onDeleteOverlay={handleDeleteOverlay}
+                    onClearOverlays={handleClearOverlays}
+                  />
+                </div>
+              )}
             </div>
           </div>
         </motion.div>
