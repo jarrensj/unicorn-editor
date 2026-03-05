@@ -155,21 +155,28 @@ export default function QRCodeGenerator() {
               </div>
 
               <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Background Color</label>
+                <label className={`text-sm font-medium ${useTransparent ? "text-muted-foreground" : "text-foreground"}`}>
+                  Background Color
+                </label>
                 <div className="flex gap-2">
                   <input
                     type="color"
                     value={bgColor}
                     onChange={(e) => setBgColor(e.target.value)}
-                    className="w-12 h-10 rounded cursor-pointer"
+                    disabled={useTransparent}
+                    className={`w-12 h-10 rounded ${useTransparent ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                   />
                   <Input
                     value={bgColor}
                     onChange={(e) => setBgColor(e.target.value)}
                     placeholder="#FFFFFF"
+                    disabled={useTransparent}
                     className="flex-1 bg-input"
                   />
                 </div>
+                {useTransparent && (
+                  <p className="text-xs text-muted-foreground">Background color is disabled in transparent mode</p>
+                )}
               </div>
 
               <div className="space-y-2">

@@ -33,27 +33,10 @@ const BackgroundOptionsList = ({
   return (
     <div className="relative">
       <ScrollArea className="h-[390px] overflow-y-auto pr-4" ref={scrollAreaRef}>
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-          {backgroundOptions.map((option) => (
-            <StandardBackgroundOption
-              key={option.id}
-              option={option}
-              isSelected={selectedId === option.id}
-              onSelect={onSelectStandard}
-            />
-          ))}
-
-          {/* Custom image upload option */}
-          <CustomImageUploader 
-            isSelected={selectedId === 'custom-image'} 
-            onClick={onSelectCustom} 
-          />
-        </div>
-        
-        {/* Saved background images section */}
+        {/* Saved background images section - shown first */}
         {savedBackgrounds.length > 0 && (
-          <div className="mt-6">
-            <h3 className="text-sm font-medium mb-2 text-gray-700">Saved Background Images</h3>
+          <div className="mb-6">
+            <h3 className="text-sm font-medium mb-2 text-gray-700">Custom Backgrounds</h3>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
               {savedBackgrounds.map((background) => (
                 <SavedBackgroundImage
@@ -68,6 +51,29 @@ const BackgroundOptionsList = ({
             </div>
           </div>
         )}
+        
+        {/* Standard backgrounds section */}
+        <div>
+          {savedBackgrounds.length > 0 && (
+            <h3 className="text-sm font-medium mb-2 text-gray-700">Standard Backgrounds</h3>
+          )}
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {backgroundOptions.map((option) => (
+              <StandardBackgroundOption
+                key={option.id}
+                option={option}
+                isSelected={selectedId === option.id}
+                onSelect={onSelectStandard}
+              />
+            ))}
+
+            {/* Custom image upload option */}
+            <CustomImageUploader 
+              isSelected={selectedId === 'custom-image'} 
+              onClick={onSelectCustom} 
+            />
+          </div>
+        </div>
       </ScrollArea>
       
       {/* Scroll indicator */}
