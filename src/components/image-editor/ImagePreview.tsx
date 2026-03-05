@@ -13,6 +13,7 @@ type ImagePreviewProps = {
   frameCornerRadius: number;
   canvasWidth: number;
   canvasHeight: number;
+  isDualMode?: boolean;
 };
 
 const ImagePreview = ({ 
@@ -24,7 +25,8 @@ const ImagePreview = ({
   imageCornerRadius,
   frameCornerRadius,
   canvasWidth,
-  canvasHeight
+  canvasHeight,
+  isDualMode = false
 }: ImagePreviewProps) => {
   return (
     <div className="flex flex-col">
@@ -76,7 +78,8 @@ const ImagePreview = ({
                       transition: 'transform 0.2s ease-in-out',
                       maxWidth: '95%',
                       maxHeight: '95%',
-                      borderRadius: `${imageCornerRadius}px`
+                      // In dual mode, corner radius is already applied to individual images
+                      borderRadius: isDualMode ? '0px' : `${imageCornerRadius}px`
                     }}
                   />
                 </div>
@@ -97,6 +100,7 @@ const ImagePreview = ({
         frameCornerRadius={frameCornerRadius}
         canvasWidth={canvasWidth}
         canvasHeight={canvasHeight}
+        isDualMode={isDualMode}
       />
     </div>
   );
