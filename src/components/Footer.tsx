@@ -62,7 +62,20 @@ const Footer = () => {
             Unicorn Editor. No humans allowed.
           </p>
           
-          <div className="mt-4 text-xs text-gray-400">
+          <div className="mt-4 mb-4 inline-flex items-center gap-2 rounded-full border border-unicorn-purple/30 bg-unicorn-purple/5 px-4 py-2 text-sm text-unicorn-purple">
+            <span>🏷️</span>
+            <span>This website is for sale —</span>
+            <a
+              href="https://kwaji.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-semibold underline hover:text-unicorn-purpleDark transition-colors"
+            >
+              Contact us
+            </a>
+          </div>
+
+          <div className="text-xs text-gray-400">
             <p>Powered by unicorn magic. Website may not display properly for non-magical beings.</p>
           </div>
         </div>
