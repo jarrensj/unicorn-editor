@@ -1,11 +1,12 @@
 
 // Main entry point for image processing utilities
 export { processImageDownload } from './download';
-export { 
+export {
   createCanvas,
-  drawBackground, 
-  drawBackgroundImage, 
-  drawMainImage 
+  drawBackground,
+  drawBackgroundImage,
+  drawMainImage,
+  drawOverlays
 } from './canvas';
 export {
   canvasToBlob,

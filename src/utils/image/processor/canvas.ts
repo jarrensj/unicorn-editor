@@ -1,3 +1,4 @@
+import type { Overlay } from "@/types/overlay";
 
 // Helper functions for canvas operations
 export const createCanvas = (
@@ -213,7 +214,49 @@ export const drawMainImage = (
   
   // Draw image with scaling
   ctx.drawImage(img, offsetX, offsetY, finalWidth, finalHeight);
-  
+
   // Restore context state
   ctx.restore();
+};
+
+// Draw overlays onto the canvas
+// Overlays are stored as percentages of the container, so we convert to pixel coords
+export const drawOverlays = (
+  ctx: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement,
+  overlays: Overlay[]
+): Promise<void> => {
+  return new Promise((resolve) => {
+    let pending = 0;
+
+    for (const overlay of overlays) {
+      const x = (overlay.x / 100) * canvas.width;
+      const y = (overlay.y / 100) * canvas.height;
+      const w = (overlay.width / 100) * canvas.width;
+      const h = (overlay.height / 100) * canvas.height;
+
+      if (overlay.type === "square") {
+        ctx.fillStyle = overlay.color || "#000000";
+        ctx.beginPath();
+        ctx.roundRect(x, y, w, h, 2);
+        ctx.fill();
+      } else if (overlay.type === "image" && overlay.imageUrl) {
+        pending++;
+        const img = new Image();
+        img.onload = () => {
+          ctx.drawImage(img, x, y, w, h);
+          pending--;
+          if (pending === 0) resolve();
+        };
+        img.onerror = () => {
+          pending--;
+          if (pending === 0) resolve();
+        };
+        img.src = overlay.imageUrl;
+      }
+    }
+
+    // If no image overlays, resolve immediately
+    if (pending === 0) resolve();
+  });
 };

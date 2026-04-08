@@ -1,12 +1,13 @@
 
 import { toast } from "sonner";
-import { createCanvas, drawBackground, drawBackgroundImage, drawMainImage } from "./canvas";
+import { createCanvas, drawBackground, drawBackgroundImage, drawMainImage, drawOverlays } from "./canvas";
 import { canvasToBlob, downloadImage, shareImage, openImageInNewTab, copyToClipboard } from "./share";
 import { isMobileDevice, isIOSSafari } from "./device";
+import type { Overlay } from "@/types/overlay";
 
 // Process an image for download
 export const processImageDownload = (
-  imageUrl: string | null, 
+  imageUrl: string | null,
   imageElement: HTMLImageElement | null,
   selectedBackground: string,
   backgroundImage: string | null,
@@ -14,31 +15,35 @@ export const processImageDownload = (
   squareFormat: boolean = true, // Parameter kept for compatibility but always used as true
   imageCornerRadius: number = 0, // Corner radius for the uploaded image
   frameCornerRadius: number = 0, // Corner radius for the entire frame
-  targetSize?: { width: number; height: number }
+  targetSize?: { width: number; height: number },
+  overlays: Overlay[] = []
 ) => {
   if (!imageUrl || !imageElement) return;
-  
+
   try {
     const { canvas, ctx } = createCanvas(imageElement, squareFormat, targetSize);
-    
+
     // Create and process the image with background
     const processWithBackground = () => {
       // Draw background
       if (backgroundImage) {
         // If we have a custom image background
         const bgImg = new Image();
-        bgImg.onload = () => {
+        bgImg.onload = async () => {
           drawBackgroundImage(ctx, bgImg, canvas);
           drawMainImage(ctx, imageElement, canvas, imageScale, imageCornerRadius);
+          await drawOverlays(ctx, canvas, overlays);
           finishDownload(canvas, frameCornerRadius);
         };
-        
+
         bgImg.src = backgroundImage;
       } else {
         // Fill background color or use gradient
         drawBackground(ctx, canvas, selectedBackground);
         drawMainImage(ctx, imageElement, canvas, imageScale, imageCornerRadius);
-        finishDownload(canvas, frameCornerRadius);
+        drawOverlays(ctx, canvas, overlays).then(() => {
+          finishDownload(canvas, frameCornerRadius);
+        });
       }
     };
 
@@ -54,34 +59,34 @@ export const processImageDownload = (
 const finishDownload = async (canvas: HTMLCanvasElement, frameCornerRadius: number = 0) => {
   try {
     let finalCanvas = canvas;
-    
+
     // If frame corner radius is specified, create a new canvas with rounded corners
     if (frameCornerRadius > 0) {
       const roundedCanvas = document.createElement("canvas");
       const roundedCtx = roundedCanvas.getContext("2d");
-      
+
       if (roundedCtx) {
         roundedCanvas.width = canvas.width;
         roundedCanvas.height = canvas.height;
-        
+
         // Create clipping path with rounded corners
         roundedCtx.beginPath();
         roundedCtx.roundRect(0, 0, canvas.width, canvas.height, frameCornerRadius);
         roundedCtx.clip();
-        
+
         // Draw the original canvas onto the rounded canvas
         roundedCtx.drawImage(canvas, 0, 0);
-        
+
         finalCanvas = roundedCanvas;
       }
     }
-    
+
     const blob = await canvasToBlob(finalCanvas);
-    
+
     if (isMobileDevice()) {
       // Try web share API first
       const shared = await shareImage(blob);
-      
+
       if (!shared) {
         // If share API failed or is not available
         if (isIOSSafari()) {
