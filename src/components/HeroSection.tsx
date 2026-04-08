@@ -3,6 +3,7 @@ import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import FloatingOrbs from "./hero/FloatingOrbs";
 import HeroContent from "./hero/HeroContent";
+import IOSDownloadBanner from "./hero/IOSDownloadBanner";
 import ImageUploader from "./image-editor/ImageUploader";
 import { useMousePosition } from "@/hooks/useMousePosition";
 
@@ -26,7 +27,9 @@ const HeroSection = ({ onImageUploaded }: HeroSectionProps) => {
       className="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden px-4 py-20"
     >
       <HeroContent />
-      
+
+      <IOSDownloadBanner />
+
       {/* Always show the ImageUploader, not conditionally */}
       <ImageUploader onImageUpload={handleImageUpload} />
       
