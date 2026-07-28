@@ -70,10 +70,34 @@ export default function RoundImage() {
       ctx.clip()
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
 
-      const link = document.createElement("a")
-      link.href = canvas.toDataURL("image/png")
-      link.download = "rounded-image.png"
-      link.click()
+      canvas.toBlob(async (blob) => {
+        if (!blob) return
+        const fileName = "rounded-image.png"
+
+        // iOS Safari ignores the anchor `download` attribute, so use the
+        // Web Share API when available (gives a native "Save Image" sheet).
+        const file = new File([blob], fileName, { type: "image/png" })
+        const nav = navigator as Navigator & {
+          canShare?: (data: { files: File[] }) => boolean
+        }
+        if (nav.canShare?.({ files: [file] }) && nav.share) {
+          try {
+            await nav.share({ files: [file], title: fileName })
+            return
+          } catch (err) {
+            // User cancelled the share sheet — don't fall back to a download.
+            if (err instanceof DOMException && err.name === "AbortError") return
+            // Any other failure falls through to the anchor download below.
+          }
+        }
+
+        const url = URL.createObjectURL(blob)
+        const link = document.createElement("a")
+        link.href = url
+        link.download = fileName
+        link.click()
+        URL.revokeObjectURL(url)
+      }, "image/png")
     }
     img.src = image
   }
