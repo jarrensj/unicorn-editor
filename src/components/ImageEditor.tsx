@@ -28,6 +28,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   const [imageCornerRadius, setImageCornerRadius] = useState<number>(0); // Corner radius for the uploaded image
   const [frameCornerRadius, setFrameCornerRadius] = useState<number>(0); // Corner radius for the entire frame
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({ id: "1080x1080", label: "1080×1080", width: 1080, height: 1080 });
+  const [watermarkText, setWatermarkText] = useState<string>("");
   
   // Load the image from props only, not localStorage
   useEffect(() => {
@@ -86,7 +87,8 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
       true,
       imageCornerRadius,
       frameCornerRadius,
-      { width: canvasSize.width, height: canvasSize.height }
+      { width: canvasSize.width, height: canvasSize.height },
+      watermarkText
     );
   };
   
@@ -117,6 +119,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
               frameCornerRadius={frameCornerRadius}
               canvasWidth={canvasSize.width}
               canvasHeight={canvasSize.height}
+              watermarkText={watermarkText}
             />
             <div>
               <h3 className="text-xl font-semibold mb-4">Background Options</h3>
@@ -135,6 +138,8 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
                 frameCornerRadius={frameCornerRadius}
                 onImageCornerRadiusChange={handleImageCornerRadiusChange}
                 onFrameCornerRadiusChange={handleFrameCornerRadiusChange}
+                watermarkText={watermarkText}
+                onWatermarkTextChange={setWatermarkText}
               />
             </div>
           </div>

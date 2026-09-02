@@ -1,7 +1,11 @@
 
 import React from "react";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
-import ActionButtons, { type ActionButtonsComponentProps } from "./ActionButtons";
+import ActionButtons from "./ActionButtons";
+import {
+  WATERMARK_FONT_FAMILY,
+  WATERMARK_LAYOUT,
+} from "@/utils/image/processor/watermark";
 
 type ImagePreviewProps = {
   imageUrl: string | null;
@@ -13,6 +17,7 @@ type ImagePreviewProps = {
   frameCornerRadius: number;
   canvasWidth: number;
   canvasHeight: number;
+  watermarkText: string;
 };
 
 const ImagePreview = ({ 
@@ -24,8 +29,11 @@ const ImagePreview = ({
   imageCornerRadius,
   frameCornerRadius,
   canvasWidth,
-  canvasHeight
+  canvasHeight,
+  watermarkText
 }: ImagePreviewProps) => {
+  const trimmedWatermark = watermarkText.trim();
+
   return (
     <div className="flex flex-col">
       <h3 className="text-xl font-semibold mb-4">Preview</h3>
@@ -45,7 +53,8 @@ const ImagePreview = ({
               className="relative w-full h-full flex items-center justify-center"
               style={{
                 borderRadius: frameCornerRadius > 0 ? `${frameCornerRadius}px` : '0px',
-                overflow: 'hidden'
+                overflow: 'hidden',
+                containerType: 'size'
               }}
             >
               {/* Background Layer */}
@@ -81,6 +90,30 @@ const ImagePreview = ({
                   />
                 </div>
               )}
+
+              {trimmedWatermark && (
+                <div
+                  className="absolute inset-0 z-20 pointer-events-none flex justify-center"
+                  aria-hidden="true"
+                >
+                  <p
+                    className="absolute text-center break-words"
+                    style={{
+                      fontFamily: `"${WATERMARK_FONT_FAMILY}", sans-serif`,
+                      fontWeight: WATERMARK_LAYOUT.fontWeight,
+                      fontSize: `${WATERMARK_LAYOUT.fontSizeRatio * 100}cqmin`,
+                      lineHeight: WATERMARK_LAYOUT.lineHeight,
+                      color: WATERMARK_LAYOUT.fillStyle,
+                      textShadow: `0 0.08em ${WATERMARK_LAYOUT.shadowBlurRatio}em ${WATERMARK_LAYOUT.shadowColor}`,
+                      bottom: `${WATERMARK_LAYOUT.bottomPaddingRatio * 100}cqmin`,
+                      maxWidth: `${WATERMARK_LAYOUT.maxWidthRatio * 100}%`,
+                      margin: 0,
+                    }}
+                  >
+                    {trimmedWatermark}
+                  </p>
+                </div>
+              )}
             </div>
           </AspectRatio>
         </div>
@@ -97,6 +130,7 @@ const ImagePreview = ({
         frameCornerRadius={frameCornerRadius}
         canvasWidth={canvasWidth}
         canvasHeight={canvasHeight}
+        watermarkText={watermarkText}
       />
     </div>
   );
