@@ -1,14 +1,21 @@
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Slider } from "@/components/ui/slider";
 import { ChevronDown, ChevronLeft, ChevronRight, ChevronUp, Type } from "lucide-react";
 import {
+  WATERMARK_HORIZONTAL,
+  WATERMARK_NUDGE_STEP,
+  WATERMARK_POSITION_MAX,
+  WATERMARK_POSITION_MIN,
+  WATERMARK_VERTICAL,
   canNudgeWatermark,
+  clampWatermarkValue,
+  getMatchingPreset,
+  getPresetPosition,
   nudgeWatermarkPosition,
   type WatermarkHorizontal,
   type WatermarkPosition,
   type WatermarkVertical,
-  WATERMARK_HORIZONTAL,
-  WATERMARK_VERTICAL,
 } from "@/utils/image/processor/watermark";
 
 type WatermarkInputProps = {
@@ -24,9 +31,16 @@ const POSITION_LABELS: Record<WatermarkVertical, Record<WatermarkHorizontal, str
   bottom: { left: "Bottom left", center: "Bottom", right: "Bottom right" },
 };
 
+const formatPercent = (value: number): string => `${Math.round(value)}%`;
+
 const WatermarkInput = ({ value, onChange, position, onPositionChange }: WatermarkInputProps) => {
+  const matchingPreset = getMatchingPreset(position);
+  const positionLabel = matchingPreset
+    ? POSITION_LABELS[matchingPreset.vertical][matchingPreset.horizontal]
+    : `${formatPercent(position.x)}, ${formatPercent(position.y)}`;
+
   const move = (direction: "up" | "down" | "left" | "right") => {
-    onPositionChange(nudgeWatermarkPosition(position, direction));
+    onPositionChange(nudgeWatermarkPosition(position, direction, WATERMARK_NUDGE_STEP));
   };
 
   return (
@@ -46,12 +60,10 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
         />
       </div>
 
-      <div className="space-y-2">
+      <div className="space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-sm text-gray-600">Position</span>
-          <span className="text-xs text-gray-500">
-            {POSITION_LABELS[position.vertical][position.horizontal]}
-          </span>
+          <span className="text-xs text-gray-500">{positionLabel}</span>
         </div>
 
         <div className="flex items-center justify-center gap-3">
@@ -80,11 +92,12 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
               <ChevronUp className="h-4 w-4" />
             </Button>
 
-            <div className="grid grid-cols-3 gap-1" role="radiogroup" aria-label="Watermark position">
+            <div className="grid grid-cols-3 gap-1" role="radiogroup" aria-label="Watermark position presets">
               {WATERMARK_VERTICAL.map((vertical) =>
                 WATERMARK_HORIZONTAL.map((horizontal) => {
                   const selected =
-                    position.horizontal === horizontal && position.vertical === vertical;
+                    matchingPreset?.horizontal === horizontal &&
+                    matchingPreset?.vertical === vertical;
                   const label = POSITION_LABELS[vertical][horizontal];
                   return (
                     <button
@@ -93,7 +106,7 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
                       role="radio"
                       aria-checked={selected}
                       aria-label={label}
-                      onClick={() => onPositionChange({ horizontal, vertical })}
+                      onClick={() => onPositionChange(getPresetPosition(horizontal, vertical))}
                       className={`h-6 w-6 rounded-sm border transition-colors ${
                         selected
                           ? "border-unicorn-purple bg-unicorn-purple"
@@ -130,10 +143,45 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
+
+        <div className="space-y-3">
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs text-gray-600">Horizontal</span>
+              <span className="text-xs text-gray-500">{formatPercent(position.x)}</span>
+            </div>
+            <Slider
+              min={WATERMARK_POSITION_MIN}
+              max={WATERMARK_POSITION_MAX}
+              step={1}
+              value={[position.x]}
+              onValueChange={([x]) =>
+                onPositionChange({ ...position, x: clampWatermarkValue(x) })
+              }
+              aria-label="Watermark horizontal position"
+            />
+          </div>
+          <div>
+            <div className="mb-1 flex items-center justify-between">
+              <span className="text-xs text-gray-600">Vertical</span>
+              <span className="text-xs text-gray-500">{formatPercent(position.y)}</span>
+            </div>
+            <Slider
+              min={WATERMARK_POSITION_MIN}
+              max={WATERMARK_POSITION_MAX}
+              step={1}
+              value={[position.y]}
+              onValueChange={([y]) =>
+                onPositionChange({ ...position, y: clampWatermarkValue(y) })
+              }
+              aria-label="Watermark vertical position"
+            />
+          </div>
+        </div>
       </div>
 
       <p className="text-xs text-gray-500">
-        Move the watermark with the arrows or the grid. The same position is used for copy and download.
+        Arrows nudge 2% at a time. Sliders give 1% control. Copy and download use the same placement.
       </p>
     </div>
   );

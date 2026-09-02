@@ -9,13 +9,19 @@ export type WatermarkHorizontal = "left" | "center" | "right";
 export type WatermarkVertical = "top" | "middle" | "bottom";
 
 export type WatermarkPosition = {
-  horizontal: WatermarkHorizontal;
-  vertical: WatermarkVertical;
+  x: number;
+  y: number;
 };
 
+export const WATERMARK_POSITION_MIN = 2;
+export const WATERMARK_POSITION_MAX = 98;
+export const WATERMARK_NUDGE_STEP = 2;
+export const WATERMARK_PRESET_INSET = 8;
+export const WATERMARK_PRESET_MATCH_TOLERANCE = 2.5;
+
 export const DEFAULT_WATERMARK_POSITION: WatermarkPosition = {
-  horizontal: "center",
-  vertical: "bottom",
+  x: 50,
+  y: 100 - WATERMARK_PRESET_INSET,
 };
 
 export const WATERMARK_HORIZONTAL: WatermarkHorizontal[] = ["left", "center", "right"];
@@ -33,70 +39,92 @@ export const WATERMARK_LAYOUT = {
   lineHeight: 1.2,
 } as const;
 
+export const clampWatermarkValue = (value: number): number => {
+  return Math.min(
+    WATERMARK_POSITION_MAX,
+    Math.max(WATERMARK_POSITION_MIN, Math.round(value * 10) / 10)
+  );
+};
+
+export const clampWatermarkPosition = (position: WatermarkPosition): WatermarkPosition => ({
+  x: clampWatermarkValue(position.x),
+  y: clampWatermarkValue(position.y),
+});
+
+export const getPresetPosition = (
+  horizontal: WatermarkHorizontal,
+  vertical: WatermarkVertical
+): WatermarkPosition => {
+  const x =
+    horizontal === "left"
+      ? WATERMARK_PRESET_INSET
+      : horizontal === "right"
+        ? 100 - WATERMARK_PRESET_INSET
+        : 50;
+  const y =
+    vertical === "top"
+      ? WATERMARK_PRESET_INSET
+      : vertical === "bottom"
+        ? 100 - WATERMARK_PRESET_INSET
+        : 50;
+
+  return { x, y };
+};
+
+export const getMatchingPreset = (
+  position: WatermarkPosition
+): { horizontal: WatermarkHorizontal; vertical: WatermarkVertical } | null => {
+  for (const vertical of WATERMARK_VERTICAL) {
+    for (const horizontal of WATERMARK_HORIZONTAL) {
+      const preset = getPresetPosition(horizontal, vertical);
+      if (
+        Math.abs(preset.x - position.x) <= WATERMARK_PRESET_MATCH_TOLERANCE &&
+        Math.abs(preset.y - position.y) <= WATERMARK_PRESET_MATCH_TOLERANCE
+      ) {
+        return { horizontal, vertical };
+      }
+    }
+  }
+
+  return null;
+};
+
 export const getWatermarkFontSize = (width: number, height: number): number => {
   return Math.max(14, Math.min(width, height) * WATERMARK_LAYOUT.fontSizeRatio);
 };
 
 export const nudgeWatermarkPosition = (
   position: WatermarkPosition,
-  direction: "up" | "down" | "left" | "right"
+  direction: "up" | "down" | "left" | "right",
+  step: number = WATERMARK_NUDGE_STEP
 ): WatermarkPosition => {
   const next = { ...position };
 
-  if (direction === "left" || direction === "right") {
-    const index = WATERMARK_HORIZONTAL.indexOf(position.horizontal);
-    const nextIndex = direction === "left" ? index - 1 : index + 1;
-    if (nextIndex >= 0 && nextIndex < WATERMARK_HORIZONTAL.length) {
-      next.horizontal = WATERMARK_HORIZONTAL[nextIndex];
-    }
-  } else {
-    const index = WATERMARK_VERTICAL.indexOf(position.vertical);
-    const nextIndex = direction === "up" ? index - 1 : index + 1;
-    if (nextIndex >= 0 && nextIndex < WATERMARK_VERTICAL.length) {
-      next.vertical = WATERMARK_VERTICAL[nextIndex];
-    }
-  }
+  if (direction === "left") next.x -= step;
+  if (direction === "right") next.x += step;
+  if (direction === "up") next.y -= step;
+  if (direction === "down") next.y += step;
 
-  return next;
+  return clampWatermarkPosition(next);
 };
 
 export const canNudgeWatermark = (
   position: WatermarkPosition,
   direction: "up" | "down" | "left" | "right"
 ): boolean => {
-  if (direction === "left") return position.horizontal !== "left";
-  if (direction === "right") return position.horizontal !== "right";
-  if (direction === "up") return position.vertical !== "top";
-  return position.vertical !== "bottom";
+  if (direction === "left") return position.x > WATERMARK_POSITION_MIN;
+  if (direction === "right") return position.x < WATERMARK_POSITION_MAX;
+  if (direction === "up") return position.y > WATERMARK_POSITION_MIN;
+  return position.y < WATERMARK_POSITION_MAX;
 };
 
-export const getWatermarkPreviewPlacement = (position: WatermarkPosition) => {
-  const inset = `${WATERMARK_LAYOUT.edgePaddingRatio * 100}cqmin`;
-  const style: CSSProperties = {
-    textAlign: position.horizontal,
+export const getWatermarkPreviewPlacement = (position: WatermarkPosition): CSSProperties => {
+  return {
+    left: `${position.x}%`,
+    top: `${position.y}%`,
+    transform: "translate(-50%, -50%)",
+    textAlign: "center",
   };
-
-  if (position.horizontal === "left") {
-    style.left = inset;
-  } else if (position.horizontal === "right") {
-    style.right = inset;
-  } else {
-    style.left = "50%";
-    style.transform = "translateX(-50%)";
-  }
-
-  if (position.vertical === "top") {
-    style.top = inset;
-  } else if (position.vertical === "bottom") {
-    style.bottom = inset;
-  } else {
-    style.top = "50%";
-    style.transform = style.transform
-      ? `${style.transform} translateY(-50%)`
-      : "translateY(-50%)";
-  }
-
-  return style;
 };
 
 export const ensureWatermarkFontLoaded = async (): Promise<void> => {
@@ -141,41 +169,6 @@ const wrapWatermarkLines = (
   return lines;
 };
 
-const getWatermarkAnchor = (
-  canvas: HTMLCanvasElement,
-  position: WatermarkPosition,
-  lineCount: number,
-  fontSize: number,
-  lineHeight: number
-): { x: number; textAlign: CanvasTextAlign; firstLineY: number; textBaseline: CanvasTextBaseline } => {
-  const padding = Math.min(canvas.width, canvas.height) * WATERMARK_LAYOUT.edgePaddingRatio;
-  const blockHeight = (lineCount - 1) * lineHeight + fontSize;
-
-  let x: number;
-  let textAlign: CanvasTextAlign;
-  if (position.horizontal === "left") {
-    x = padding;
-    textAlign = "left";
-  } else if (position.horizontal === "right") {
-    x = canvas.width - padding;
-    textAlign = "right";
-  } else {
-    x = canvas.width / 2;
-    textAlign = "center";
-  }
-
-  let firstLineY: number;
-  if (position.vertical === "top") {
-    firstLineY = padding;
-  } else if (position.vertical === "bottom") {
-    firstLineY = canvas.height - padding - blockHeight;
-  } else {
-    firstLineY = (canvas.height - blockHeight) / 2;
-  }
-
-  return { x, textAlign, firstLineY, textBaseline: "top" };
-};
-
 export const drawWatermark = async (
   ctx: CanvasRenderingContext2D,
   canvas: HTMLCanvasElement,
@@ -192,6 +185,7 @@ export const drawWatermark = async (
   const fontSize = getWatermarkFontSize(canvas.width, canvas.height);
   const maxWidth = canvas.width * WATERMARK_LAYOUT.maxWidthRatio;
   const lineHeight = fontSize * WATERMARK_LAYOUT.lineHeight;
+  const clamped = clampWatermarkPosition(position);
 
   ctx.save();
   ctx.font = `${WATERMARK_FONT_WEIGHT} ${fontSize}px "${WATERMARK_FONT_FAMILY}", sans-serif`;
@@ -200,21 +194,17 @@ export const drawWatermark = async (
   ctx.shadowBlur = fontSize * WATERMARK_LAYOUT.shadowBlurRatio;
   ctx.shadowOffsetX = 0;
   ctx.shadowOffsetY = Math.max(1, fontSize * 0.08);
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
 
   const lines = wrapWatermarkLines(ctx, text, maxWidth);
-  const { x, textAlign, firstLineY, textBaseline } = getWatermarkAnchor(
-    canvas,
-    position,
-    lines.length,
-    fontSize,
-    lineHeight
-  );
-
-  ctx.textAlign = textAlign;
-  ctx.textBaseline = textBaseline;
+  const blockHeight = (lines.length - 1) * lineHeight + fontSize;
+  const centerX = canvas.width * (clamped.x / 100);
+  const centerY = canvas.height * (clamped.y / 100);
+  const firstLineY = centerY - blockHeight / 2;
 
   lines.forEach((line, index) => {
-    ctx.fillText(line, x, firstLineY + index * lineHeight, maxWidth);
+    ctx.fillText(line, centerX, firstLineY + index * lineHeight, maxWidth);
   });
 
   ctx.restore();
