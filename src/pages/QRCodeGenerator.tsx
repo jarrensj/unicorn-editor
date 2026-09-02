@@ -1,12 +1,15 @@
 import type React from "react"
 
 import { useState } from "react"
+import { motion } from "framer-motion"
 import QRCode from "react-qr-code"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Download, X } from "lucide-react"
+import ParticleBackground from "@/components/ParticleBackground"
+import Footer from "@/components/Footer"
 
 export default function QRCodeGenerator() {
   const [value, setValue] = useState("https://unicorneditor.com")
@@ -95,19 +98,32 @@ export default function QRCodeGenerator() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-secondary/20 p-6">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-2">
-            <h1 className="text-4xl font-bold text-foreground">QR Code Generator</h1>
-            <Badge variant="secondary" className="text-xs">WIP</Badge>
-          </div>
-          <p className="text-muted-foreground">Create custom QR codes for any URL or text</p>
-        </div>
+    <div className="relative min-h-screen overflow-x-hidden bg-white">
+      <ParticleBackground />
+      
+      <div className="relative z-10 min-h-screen p-6 pt-20">
+        <div className="max-w-4xl mx-auto">
+          <motion.div 
+            className="text-center mb-8"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6 }}
+          >
+            <div className="flex items-center justify-center gap-3 mb-2">
+              <h1 className="text-4xl md:text-5xl font-bold text-foreground">QR Code Generator</h1>
+              <Badge variant="secondary" className="text-xs">WIP</Badge>
+            </div>
+            <p className="text-muted-foreground text-lg">Create custom QR codes for any URL or text</p>
+          </motion.div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Input Section */}
-          <Card>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            {/* Input Section */}
+            <motion.div
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+            >
+              <Card className="backdrop-blur-sm bg-white/90">
             <CardHeader>
               <CardTitle>Settings</CardTitle>
               <CardDescription>Customize your QR code</CardDescription>
@@ -259,11 +275,17 @@ export default function QRCodeGenerator() {
                   </Button>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
 
-          {/* Preview Section */}
-          <Card className="flex items-center justify-center min-h-96">
+            {/* Preview Section */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+            >
+              <Card className="flex items-center justify-center min-h-96 backdrop-blur-sm bg-white/90">
             <CardContent className="flex items-center justify-center p-8">
               {value ? (
                 <div className={`relative p-6 rounded-lg shadow-lg ${useTransparent ? "bg-transparent" : "bg-white"}`}>
@@ -292,10 +314,121 @@ export default function QRCodeGenerator() {
               ) : (
                 <p className="text-muted-foreground text-center">Enter text or URL to generate QR code</p>
               )}
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+          </motion.div>
+          </div>
         </div>
       </div>
+      
+      <Footer />
+
+      {/* Floating decorative elements with animations - matching home page */}
+      <motion.div
+        className="fixed w-12 h-12 rounded-full bg-unicorn-purpleLight blur-xl opacity-70 float-slow pointer-events-none"
+        animate={{
+          x: [0, 100, 50, 150, 0],
+          y: [0, 50, 100, 50, 0],
+          scale: [1, 1.2, 1, 0.8, 1],
+          rotate: [0, 90, 180, 270, 360]
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+        style={{ left: "10%", top: "20%" }}
+      />
+      
+      <motion.div
+        className="fixed w-10 h-10 rounded-full bg-unicorn-pink blur-xl opacity-70 float pointer-events-none"
+        animate={{
+          x: [0, -70, -140, -70, 0],
+          y: [0, 100, 50, 150, 0],
+          scale: [1, 0.8, 1.2, 0.9, 1],
+          rotate: [0, -90, -180, -270, -360]
+        }}
+        transition={{
+          duration: 28,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+        style={{ right: "15%", top: "15%" }}
+      />
+      
+      <motion.div
+        className="fixed w-14 h-14 rounded-full bg-unicorn-skyBlue blur-xl opacity-70 float-fast pointer-events-none"
+        animate={{
+          x: [0, 80, 40, 120, 0],
+          y: [0, -80, -40, -120, 0],
+          scale: [1, 1.1, 0.9, 1.2, 1],
+          rotate: [0, 45, 90, 135, 180, 225, 270, 315, 360]
+        }}
+        transition={{
+          duration: 30,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+        style={{ right: "25%", bottom: "20%" }}
+      />
+      
+      <motion.div
+        className="fixed w-8 h-8 rounded-full bg-unicorn-magenta blur-xl opacity-60 float pointer-events-none"
+        animate={{
+          x: [0, -50, -100, -50, 0],
+          y: [0, -30, -60, -30, 0],
+          scale: [1, 1.3, 1, 0.7, 1],
+          filter: ["blur(12px)", "blur(18px)", "blur(12px)", "blur(8px)", "blur(12px)"]
+        }}
+        transition={{
+          duration: 22,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+        style={{ left: "20%", bottom: "25%" }}
+      />
+      
+      <motion.div
+        className="fixed w-10 h-10 rounded-full bg-unicorn-blue blur-xl opacity-50 float-slow pointer-events-none"
+        animate={{
+          x: [0, 120, 60, 180, 0],
+          y: [0, 70, 140, 70, 0],
+          scale: [1, 0.9, 1.1, 0.8, 1],
+          filter: ["blur(10px)", "blur(15px)", "blur(10px)", "blur(5px)", "blur(10%)"]
+        }}
+        transition={{
+          duration: 35,
+          repeat: Infinity,
+          repeatType: "reverse",
+        }}
+        style={{ right: "40%", top: "40%" }}
+      />
+
+      {/* Star-shaped particles */}
+      {Array.from({ length: 8 }).map((_, i) => (
+        <motion.div
+          key={i}
+          className="fixed text-unicorn-purple opacity-20 pointer-events-none"
+          style={{
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            fontSize: `${Math.random() * 1 + 0.5}rem`
+          }}
+          animate={{
+            y: [0, -50, 0],
+            x: [0, Math.random() * 30 - 15, 0],
+            rotate: [0, 360],
+            opacity: [0.2, 0.5, 0.2]
+          }}
+          transition={{
+            duration: Math.random() * 15 + 15,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          ✦
+        </motion.div>
+      ))}
     </div>
   )
 }
