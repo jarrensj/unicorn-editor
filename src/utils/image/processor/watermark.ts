@@ -51,6 +51,22 @@ export const clampWatermarkPosition = (position: WatermarkPosition): WatermarkPo
   y: clampWatermarkValue(position.y),
 });
 
+export const normalizeWatermarkPosition = (
+  position?: Partial<WatermarkPosition> | null
+): WatermarkPosition => {
+  if (
+    position &&
+    typeof position.x === "number" &&
+    Number.isFinite(position.x) &&
+    typeof position.y === "number" &&
+    Number.isFinite(position.y)
+  ) {
+    return clampWatermarkPosition({ x: position.x, y: position.y });
+  }
+
+  return DEFAULT_WATERMARK_POSITION;
+};
+
 export const getPresetPosition = (
   horizontal: WatermarkHorizontal,
   vertical: WatermarkVertical
@@ -119,9 +135,10 @@ export const canNudgeWatermark = (
 };
 
 export const getWatermarkPreviewPlacement = (position: WatermarkPosition): CSSProperties => {
+  const safePosition = normalizeWatermarkPosition(position);
   return {
-    left: `${position.x}%`,
-    top: `${position.y}%`,
+    left: `${safePosition.x}%`,
+    top: `${safePosition.y}%`,
     transform: "translate(-50%, -50%)",
     textAlign: "center",
   };
@@ -185,7 +202,7 @@ export const drawWatermark = async (
   const fontSize = getWatermarkFontSize(canvas.width, canvas.height);
   const maxWidth = canvas.width * WATERMARK_LAYOUT.maxWidthRatio;
   const lineHeight = fontSize * WATERMARK_LAYOUT.lineHeight;
-  const clamped = clampWatermarkPosition(position);
+  const clamped = normalizeWatermarkPosition(position);
 
   ctx.save();
   ctx.font = `${WATERMARK_FONT_WEIGHT} ${fontSize}px "${WATERMARK_FONT_FAMILY}", sans-serif`;

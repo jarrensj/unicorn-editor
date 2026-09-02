@@ -12,6 +12,7 @@ import {
   clampWatermarkValue,
   getMatchingPreset,
   getPresetPosition,
+  normalizeWatermarkPosition,
   nudgeWatermarkPosition,
   type WatermarkHorizontal,
   type WatermarkPosition,
@@ -34,13 +35,14 @@ const POSITION_LABELS: Record<WatermarkVertical, Record<WatermarkHorizontal, str
 const formatPercent = (value: number): string => `${Math.round(value)}%`;
 
 const WatermarkInput = ({ value, onChange, position, onPositionChange }: WatermarkInputProps) => {
-  const matchingPreset = getMatchingPreset(position);
+  const safePosition = normalizeWatermarkPosition(position);
+  const matchingPreset = getMatchingPreset(safePosition);
   const positionLabel = matchingPreset
     ? POSITION_LABELS[matchingPreset.vertical][matchingPreset.horizontal]
-    : `${formatPercent(position.x)}, ${formatPercent(position.y)}`;
+    : `${formatPercent(safePosition.x)}, ${formatPercent(safePosition.y)}`;
 
   const move = (direction: "up" | "down" | "left" | "right") => {
-    onPositionChange(nudgeWatermarkPosition(position, direction, WATERMARK_NUDGE_STEP));
+    onPositionChange(nudgeWatermarkPosition(safePosition, direction, WATERMARK_NUDGE_STEP));
   };
 
   return (
@@ -73,7 +75,7 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
             size="sm"
             className="h-8 w-8 p-0"
             aria-label="Move watermark left"
-            disabled={!canNudgeWatermark(position, "left")}
+            disabled={!canNudgeWatermark(safePosition, "left")}
             onClick={() => move("left")}
           >
             <ChevronLeft className="h-4 w-4" />
@@ -86,7 +88,7 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
               size="sm"
               className="h-8 w-8 p-0"
               aria-label="Move watermark up"
-              disabled={!canNudgeWatermark(position, "up")}
+              disabled={!canNudgeWatermark(safePosition, "up")}
               onClick={() => move("up")}
             >
               <ChevronUp className="h-4 w-4" />
@@ -124,7 +126,7 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
               size="sm"
               className="h-8 w-8 p-0"
               aria-label="Move watermark down"
-              disabled={!canNudgeWatermark(position, "down")}
+              disabled={!canNudgeWatermark(safePosition, "down")}
               onClick={() => move("down")}
             >
               <ChevronDown className="h-4 w-4" />
@@ -137,7 +139,7 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
             size="sm"
             className="h-8 w-8 p-0"
             aria-label="Move watermark right"
-            disabled={!canNudgeWatermark(position, "right")}
+            disabled={!canNudgeWatermark(safePosition, "right")}
             onClick={() => move("right")}
           >
             <ChevronRight className="h-4 w-4" />
@@ -148,15 +150,15 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
           <div>
             <div className="mb-1 flex items-center justify-between">
               <span className="text-xs text-gray-600">Horizontal</span>
-              <span className="text-xs text-gray-500">{formatPercent(position.x)}</span>
+              <span className="text-xs text-gray-500">{formatPercent(safePosition.x)}</span>
             </div>
             <Slider
               min={WATERMARK_POSITION_MIN}
               max={WATERMARK_POSITION_MAX}
               step={1}
-              value={[position.x]}
+              value={[safePosition.x]}
               onValueChange={([x]) =>
-                onPositionChange({ ...position, x: clampWatermarkValue(x) })
+                onPositionChange({ ...safePosition, x: clampWatermarkValue(x) })
               }
               aria-label="Watermark horizontal position"
             />
@@ -164,15 +166,15 @@ const WatermarkInput = ({ value, onChange, position, onPositionChange }: Waterma
           <div>
             <div className="mb-1 flex items-center justify-between">
               <span className="text-xs text-gray-600">Vertical</span>
-              <span className="text-xs text-gray-500">{formatPercent(position.y)}</span>
+              <span className="text-xs text-gray-500">{formatPercent(safePosition.y)}</span>
             </div>
             <Slider
               min={WATERMARK_POSITION_MIN}
               max={WATERMARK_POSITION_MAX}
               step={1}
-              value={[position.y]}
+              value={[safePosition.y]}
               onValueChange={([y]) =>
-                onPositionChange({ ...position, y: clampWatermarkValue(y) })
+                onPositionChange({ ...safePosition, y: clampWatermarkValue(y) })
               }
               aria-label="Watermark vertical position"
             />
