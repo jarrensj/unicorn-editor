@@ -5,6 +5,8 @@ import ActionButtons from "./ActionButtons";
 import {
   WATERMARK_FONT_FAMILY,
   WATERMARK_LAYOUT,
+  getWatermarkPreviewPlacement,
+  type WatermarkPosition,
 } from "@/utils/image/processor/watermark";
 
 type ImagePreviewProps = {
@@ -18,6 +20,7 @@ type ImagePreviewProps = {
   canvasWidth: number;
   canvasHeight: number;
   watermarkText: string;
+  watermarkPosition: WatermarkPosition;
 };
 
 const ImagePreview = ({ 
@@ -30,7 +33,8 @@ const ImagePreview = ({
   frameCornerRadius,
   canvasWidth,
   canvasHeight,
-  watermarkText
+  watermarkText,
+  watermarkPosition
 }: ImagePreviewProps) => {
   const trimmedWatermark = watermarkText.trim();
 
@@ -93,11 +97,11 @@ const ImagePreview = ({
 
               {trimmedWatermark && (
                 <div
-                  className="absolute inset-0 z-20 pointer-events-none flex justify-center"
+                  className="absolute inset-0 z-20 pointer-events-none"
                   aria-hidden="true"
                 >
                   <p
-                    className="absolute text-center break-words"
+                    className="absolute break-words"
                     style={{
                       fontFamily: `"${WATERMARK_FONT_FAMILY}", sans-serif`,
                       fontWeight: WATERMARK_LAYOUT.fontWeight,
@@ -105,9 +109,10 @@ const ImagePreview = ({
                       lineHeight: WATERMARK_LAYOUT.lineHeight,
                       color: WATERMARK_LAYOUT.fillStyle,
                       textShadow: `0 0.08em ${WATERMARK_LAYOUT.shadowBlurRatio}em ${WATERMARK_LAYOUT.shadowColor}`,
-                      bottom: `${WATERMARK_LAYOUT.bottomPaddingRatio * 100}cqmin`,
                       maxWidth: `${WATERMARK_LAYOUT.maxWidthRatio * 100}%`,
                       margin: 0,
+                      transition: "top 0.2s ease, right 0.2s ease, bottom 0.2s ease, left 0.2s ease, transform 0.2s ease",
+                      ...getWatermarkPreviewPlacement(watermarkPosition),
                     }}
                   >
                     {trimmedWatermark}
@@ -131,6 +136,7 @@ const ImagePreview = ({
         canvasWidth={canvasWidth}
         canvasHeight={canvasHeight}
         watermarkText={watermarkText}
+        watermarkPosition={watermarkPosition}
       />
     </div>
   );

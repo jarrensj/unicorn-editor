@@ -7,6 +7,7 @@ import ImageScale from "./ImageScale";
 import ImageCornerRadius from "./ImageCornerRadius";
 import WatermarkInput from "./WatermarkInput";
 import { BackgroundOption } from "./background/StandardBackgroundOption";
+import type { WatermarkPosition } from "@/utils/image/processor/watermark";
 import { standardBackgroundOptions } from "./background/backgroundOptions";
 
 type BackgroundSelectorProps = {
@@ -23,6 +24,8 @@ type BackgroundSelectorProps = {
   onFrameCornerRadiusChange?: (radius: number) => void;
   watermarkText?: string;
   onWatermarkTextChange?: (value: string) => void;
+  watermarkPosition?: WatermarkPosition;
+  onWatermarkPositionChange?: (position: WatermarkPosition) => void;
 };
 
 const BackgroundSelector = ({ 
@@ -38,7 +41,9 @@ const BackgroundSelector = ({
   onImageCornerRadiusChange,
   onFrameCornerRadiusChange,
   watermarkText,
-  onWatermarkTextChange
+  onWatermarkTextChange,
+  watermarkPosition,
+  onWatermarkPositionChange
 }: BackgroundSelectorProps) => {
   // Initialize with last selected background ID or default to rainbow
   const [selectedId, setSelectedId] = useState(lastSelectedBackground?.id || "rainbow");
@@ -157,8 +162,14 @@ const BackgroundSelector = ({
             </div>
           )}
 
-          {watermarkText !== undefined && onWatermarkTextChange && (
-            <WatermarkInput value={watermarkText} onChange={onWatermarkTextChange} />
+          {watermarkText !== undefined && onWatermarkTextChange &&
+           watermarkPosition && onWatermarkPositionChange && (
+            <WatermarkInput
+              value={watermarkText}
+              onChange={onWatermarkTextChange}
+              position={watermarkPosition}
+              onPositionChange={onWatermarkPositionChange}
+            />
           )}
         </div>
       )}

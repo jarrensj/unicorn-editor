@@ -20,4 +20,10 @@ export {
   isIOSSafari
 } from './device';
 export { composeEditedImage } from './compose';
-export { drawWatermark, WATERMARK_LAYOUT, WATERMARK_FONT_FAMILY } from './watermark';
+export {
+  drawWatermark,
+  WATERMARK_LAYOUT,
+  WATERMARK_FONT_FAMILY,
+  DEFAULT_WATERMARK_POSITION,
+} from './watermark';
+export type { WatermarkPosition } from './watermark';
