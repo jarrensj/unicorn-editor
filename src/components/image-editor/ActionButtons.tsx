@@ -4,6 +4,7 @@ import { Download, Clipboard, Share2 } from "lucide-react";
 import { composeEditedImage, handleImageAction } from "@/utils/image/processor";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
+import type { WatermarkPosition } from "@/utils/image/processor/watermark";
 
 export type ActionButtonsComponentProps = {
   imageUrl: string | null;
@@ -16,6 +17,7 @@ export type ActionButtonsComponentProps = {
   canvasWidth: number;
   canvasHeight: number;
   watermarkText: string;
+  watermarkPosition: WatermarkPosition;
 };
 
 const ActionButtons: React.FC<ActionButtonsComponentProps> = ({ 
@@ -28,7 +30,8 @@ const ActionButtons: React.FC<ActionButtonsComponentProps> = ({
   frameCornerRadius,
   canvasWidth,
   canvasHeight,
-  watermarkText
+  watermarkText,
+  watermarkPosition
 }: ActionButtonsComponentProps) => {
   const isMobile = useIsMobile();
   
@@ -52,6 +55,7 @@ const ActionButtons: React.FC<ActionButtonsComponentProps> = ({
         frameCornerRadius,
         targetSize: { width: canvasWidth, height: canvasHeight },
         watermarkText,
+        watermarkPosition,
       });
 
       await handleImageAction(canvas);

@@ -7,6 +7,10 @@ import EditorHeading from "./image-editor/EditorHeading";
 import { processImageDownload } from "@/utils/imageProcessor"; // Keeping original import path for backward compatibility
 import CanvasSizeSelector, { type CanvasSize } from "./image-editor/CanvasSizeSelector";
 import { useLastSelectedBackground } from "@/hooks/useLastSelectedBackground";
+import {
+  DEFAULT_WATERMARK_POSITION,
+  type WatermarkPosition,
+} from "@/utils/image/processor/watermark";
 
 type ImageEditorProps = {
   initialImageUrl?: string | null;
@@ -29,6 +33,9 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
   const [frameCornerRadius, setFrameCornerRadius] = useState<number>(0); // Corner radius for the entire frame
   const [canvasSize, setCanvasSize] = useState<CanvasSize>({ id: "1080x1080", label: "1080×1080", width: 1080, height: 1080 });
   const [watermarkText, setWatermarkText] = useState<string>("");
+  const [watermarkPosition, setWatermarkPosition] = useState<WatermarkPosition>(
+    DEFAULT_WATERMARK_POSITION
+  );
   
   // Load the image from props only, not localStorage
   useEffect(() => {
@@ -88,7 +95,8 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
       imageCornerRadius,
       frameCornerRadius,
       { width: canvasSize.width, height: canvasSize.height },
-      watermarkText
+      watermarkText,
+      watermarkPosition
     );
   };
   
@@ -120,6 +128,7 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
               canvasWidth={canvasSize.width}
               canvasHeight={canvasSize.height}
               watermarkText={watermarkText}
+              watermarkPosition={watermarkPosition}
             />
             <div>
               <h3 className="text-xl font-semibold mb-4">Background Options</h3>
@@ -140,6 +149,8 @@ const ImageEditor = ({ initialImageUrl }: ImageEditorProps) => {
                 onFrameCornerRadiusChange={handleFrameCornerRadiusChange}
                 watermarkText={watermarkText}
                 onWatermarkTextChange={setWatermarkText}
+                watermarkPosition={watermarkPosition}
+                onWatermarkPositionChange={setWatermarkPosition}
               />
             </div>
           </div>

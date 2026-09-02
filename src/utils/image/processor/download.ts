@@ -3,6 +3,7 @@ import { toast } from "sonner";
 import { composeEditedImage } from "./compose";
 import { canvasToBlob, downloadImage, shareImage, openImageInNewTab } from "./share";
 import { isMobileDevice, isIOSSafari } from "./device";
+import { DEFAULT_WATERMARK_POSITION, type WatermarkPosition } from "./watermark";
 
 // Process an image for download
 export const processImageDownload = (
@@ -15,7 +16,8 @@ export const processImageDownload = (
   imageCornerRadius: number = 0, // Corner radius for the uploaded image
   frameCornerRadius: number = 0, // Corner radius for the entire frame
   targetSize?: { width: number; height: number },
-  watermarkText: string = ""
+  watermarkText: string = "",
+  watermarkPosition: WatermarkPosition = DEFAULT_WATERMARK_POSITION
 ) => {
   if (!imageUrl || !imageElement) return;
   
@@ -28,6 +30,7 @@ export const processImageDownload = (
     frameCornerRadius,
     targetSize,
     watermarkText,
+    watermarkPosition,
   });
 };
 
@@ -40,6 +43,7 @@ const composeAndDownload = async (params: {
   frameCornerRadius: number;
   targetSize?: { width: number; height: number };
   watermarkText: string;
+  watermarkPosition: WatermarkPosition;
 }) => {
   try {
     const canvas = await composeEditedImage(params);

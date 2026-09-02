@@ -1,5 +1,5 @@
 import { createCanvas, drawBackground, drawBackgroundImage, drawMainImage } from "./canvas";
-import { drawWatermark } from "./watermark";
+import { DEFAULT_WATERMARK_POSITION, drawWatermark, type WatermarkPosition } from "./watermark";
 
 export type ComposeImageParams = {
   imageElement: HTMLImageElement;
@@ -10,6 +10,7 @@ export type ComposeImageParams = {
   frameCornerRadius: number;
   targetSize?: { width: number; height: number };
   watermarkText?: string;
+  watermarkPosition?: WatermarkPosition;
 };
 
 const loadImage = (src: string): Promise<HTMLImageElement> =>
@@ -57,6 +58,7 @@ export const composeEditedImage = async (
     frameCornerRadius,
     targetSize,
     watermarkText,
+    watermarkPosition = DEFAULT_WATERMARK_POSITION,
   } = params;
 
   const { canvas, ctx } = createCanvas(imageElement, true, targetSize);
@@ -69,7 +71,7 @@ export const composeEditedImage = async (
   }
 
   drawMainImage(ctx, imageElement, canvas, imageScale, imageCornerRadius);
-  await drawWatermark(ctx, canvas, watermarkText);
+  await drawWatermark(ctx, canvas, watermarkText, watermarkPosition);
 
   return applyFrameCornerRadius(canvas, frameCornerRadius);
 };
