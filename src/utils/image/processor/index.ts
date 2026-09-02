@@ -19,3 +19,5 @@ export {
   isMobileDevice,
   isIOSSafari
 } from './device';
+export { composeEditedImage } from './compose';
+export { drawWatermark, WATERMARK_LAYOUT, WATERMARK_FONT_FAMILY } from './watermark';

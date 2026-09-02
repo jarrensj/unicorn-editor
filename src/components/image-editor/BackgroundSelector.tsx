@@ -5,6 +5,7 @@ import { LastSelectedBackground } from "@/hooks/useLastSelectedBackground";
 import BackgroundOptionsList from "./background/BackgroundOptionsList";
 import ImageScale from "./ImageScale";
 import ImageCornerRadius from "./ImageCornerRadius";
+import WatermarkInput from "./WatermarkInput";
 import { BackgroundOption } from "./background/StandardBackgroundOption";
 import { standardBackgroundOptions } from "./background/backgroundOptions";
 
@@ -20,6 +21,8 @@ type BackgroundSelectorProps = {
   frameCornerRadius?: number;
   onImageCornerRadiusChange?: (radius: number) => void;
   onFrameCornerRadiusChange?: (radius: number) => void;
+  watermarkText?: string;
+  onWatermarkTextChange?: (value: string) => void;
 };
 
 const BackgroundSelector = ({ 
@@ -33,7 +36,9 @@ const BackgroundSelector = ({
   imageCornerRadius,
   frameCornerRadius,
   onImageCornerRadiusChange,
-  onFrameCornerRadiusChange
+  onFrameCornerRadiusChange,
+  watermarkText,
+  onWatermarkTextChange
 }: BackgroundSelectorProps) => {
   // Initialize with last selected background ID or default to rainbow
   const [selectedId, setSelectedId] = useState(lastSelectedBackground?.id || "rainbow");
@@ -150,6 +155,10 @@ const BackgroundSelector = ({
                 onFrameCornerRadiusChange={onFrameCornerRadiusChange}
               />
             </div>
+          )}
+
+          {watermarkText !== undefined && onWatermarkTextChange && (
+            <WatermarkInput value={watermarkText} onChange={onWatermarkTextChange} />
           )}
         </div>
       )}
